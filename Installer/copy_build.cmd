@@ -130,6 +130,7 @@ rmdir /S /Q %instPath%\translations\
 ECHO Sign Files
 
 call kph-sign-dir.cmd %instPath%\
+del %instPath%\UpdUtil.sig
 del %instPath%\TaskHelper.sig
 del %instPath%\x86\TaskHelper.sig
 

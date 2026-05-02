@@ -539,7 +539,8 @@ ULONG GetProcessDpiAwareness(HANDLE QueryHandle)
 
     if (PhBeginInitOnce(&initOnce))
     {
-        getProcessDpiAwarenessInternal = (BOOL (WINAPI *)(_In_ HANDLE hprocess,_Out_ ULONG *value))PhGetDllProcedureAddress(L"user32.dll", "GetProcessDpiAwarenessInternal", 0);
+        static PH_STRINGREF user32_dll = PH_STRINGREF_INIT(L"user32.dll");
+        getProcessDpiAwarenessInternal = (BOOL (WINAPI *)(_In_ HANDLE hprocess,_Out_ ULONG *value))PhGetDllProcedureAddress(&user32_dll, "GetProcessDpiAwarenessInternal", 0);
         PhEndInitOnce(&initOnce);
     }
 

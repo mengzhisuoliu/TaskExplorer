@@ -86,14 +86,14 @@
 #if (PHNT_MODE != PHNT_MODE_KERNEL)
 typedef enum _OBJECT_INFORMATION_CLASS
 {
-    ObjectBasicInformation, // q: OBJECT_BASIC_INFORMATION
-    ObjectNameInformation, // q: OBJECT_NAME_INFORMATION
-    ObjectTypeInformation, // q: OBJECT_TYPE_INFORMATION
-    ObjectTypesInformation, // q: OBJECT_TYPES_INFORMATION
-    ObjectHandleFlagInformation, // qs: OBJECT_HANDLE_FLAG_INFORMATION
-    ObjectSessionInformation, // s: void // change object session // (requires SeTcbPrivilege)
+    ObjectBasicInformation,         // q: OBJECT_BASIC_INFORMATION
+    ObjectNameInformation,          // q: OBJECT_NAME_INFORMATION
+    ObjectTypeInformation,          // q: OBJECT_TYPE_INFORMATION
+    ObjectTypesInformation,         // q: OBJECT_TYPES_INFORMATION
+    ObjectHandleFlagInformation,    // qs: OBJECT_HANDLE_FLAG_INFORMATION
+    ObjectSessionInformation,       // s: void // change object session // (requires SeTcbPrivilege)
     ObjectSessionObjectInformation, // s: void // change object session // (requires SeTcbPrivilege)
-    ObjectSetRefTraceInformation, // since 25H2
+    ObjectSetRefTraceInformation,   // since 25H2
     MaxObjectInfoClass
 } OBJECT_INFORMATION_CLASS;
 #else
@@ -186,14 +186,15 @@ typedef struct _OBJECT_HANDLE_FLAG_INFORMATION
 /**
  * The NtQueryObject routine retrieves various kinds of object information.
  *
- * @param Handle The handle of the object for which information is being queried.
- * @param ObjectInformationClass The information class indicating the kind of object information to be retrieved.
- * @param ObjectInformation An optional pointer to a buffer where the requested information is to be returned.
- * @param ObjectInformationLength The size of the buffer pointed to by the ObjectInformation parameter, in bytes.
- * @param ReturnLength An optional pointer to a location where the function writes the actual size of the information requested.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
+ * \param Handle The handle of the object for which information is being queried.
+ * \param ObjectInformationClass The information class indicating the kind of object information to be retrieved.
+ * \param ObjectInformation An optional pointer to a buffer where the requested information is to be returned.
+ * \param ObjectInformationLength The size of the buffer pointed to by the ObjectInformation parameter, in bytes.
+ * \param ReturnLength An optional pointer to a location where the function writes the actual size of the information requested.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -208,12 +209,13 @@ NtQueryObject(
 /**
  * The NtSetInformationObject routine changes various kinds of information about a object.
  *
- * @param Handle The handle of the object for which information is being changed.
- * @param ObjectInformationClass The type of information, supplied in the buffer pointed to by ObjectInformation, to set for the object.
- * @param ObjectInformation Pointer to a buffer that contains the information to set for the object.
- * @param ObjectInformationLength The size of the buffer pointed to by the ObjectInformation parameter, in bytes.
- * @return NTSTATUS Successful or errant status.
+ * \param Handle The handle of the object for which information is being changed.
+ * \param ObjectInformationClass The type of information, supplied in the buffer pointed to by ObjectInformation, to set for the object.
+ * \param ObjectInformation Pointer to a buffer that contains the information to set for the object.
+ * \param ObjectInformationLength The size of the buffer pointed to by the ObjectInformation parameter, in bytes.
+ * \return NTSTATUS Successful or errant status.
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -224,6 +226,9 @@ NtSetInformationObject(
     _In_ ULONG ObjectInformationLength
     );
 
+/**
+ * Options flags for NtDuplicateObject
+ */
 #define DUPLICATE_CLOSE_SOURCE 0x00000001       // Close the source handle.
 #define DUPLICATE_SAME_ACCESS 0x00000002        // Instead of using the DesiredAccess parameter, copy the access rights from the source handle to the target handle.
 #define DUPLICATE_SAME_ATTRIBUTES 0x00000004    // Instead of using the HandleAttributes parameter, copy the attributes from the source handle to the target handle.
@@ -231,16 +236,17 @@ NtSetInformationObject(
 /**
  * The NtDuplicateObject routine creates a handle that is a duplicate of the specified source handle.
  *
- * @param SourceProcessHandle A handle to the source process for the handle being duplicated.
- * @param SourceHandle The handle to duplicate.
- * @param TargetProcessHandle A handle to the target process that is to receive the new handle. This parameter is optional and can be specified as NULL if the DUPLICATE_CLOSE_SOURCE flag is set in Options.
- * @param TargetHandle A pointer to a HANDLE variable into which the routine writes the new duplicated handle. The duplicated handle is valid in the specified target process. This parameter is optional and can be specified as NULL if no duplicate handle is to be created.
- * @param DesiredAccess An ACCESS_MASK value that specifies the desired access for the new handle.
- * @param HandleAttributes A ULONG that specifies the desired attributes for the new handle.
- * @param Options A set of flags to control the behavior of the duplication operation.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwduplicateobject
+ * \param SourceProcessHandle A handle to the source process for the handle being duplicated.
+ * \param SourceHandle The handle to duplicate.
+ * \param TargetProcessHandle A handle to the target process that is to receive the new handle. This parameter is optional and can be specified as NULL if the DUPLICATE_CLOSE_SOURCE flag is set in Options.
+ * \param TargetHandle A pointer to a HANDLE variable into which the routine writes the new duplicated handle. The duplicated handle is valid in the specified target process. This parameter is optional and can be specified as NULL if no duplicate handle is to be created.
+ * \param DesiredAccess An ACCESS_MASK value that specifies the desired access for the new handle.
+ * \param HandleAttributes A ULONG that specifies the desired attributes for the new handle.
+ * \param Options A set of flags to control the behavior of the duplication operation.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwduplicateobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -257,10 +263,11 @@ NtDuplicateObject(
 /**
  * The NtMakeTemporaryObject routine changes the attributes of an object to make it temporary.
  *
- * @param Handle Handle to an object of any type.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwmaketemporaryobject
+ * \param Handle Handle to an object of any type.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwmaketemporaryobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -271,10 +278,11 @@ NtMakeTemporaryObject(
 /**
  * The NtMakePermanentObject routine changes the attributes of an object to make it permanent.
  *
- * @param Handle Handle to an object of any type.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwmaketemporaryobject
+ * \param Handle Handle to an object of any type.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwmaketemporaryobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -285,14 +293,15 @@ NtMakePermanentObject(
 /**
  * The NtSignalAndWaitForSingleObject routine signals one object and waits on another object as a single operation.
  *
- * @param SignalHandle A handle to the object to be signaled.
- * @param WaitHandle A handle to the object to wait on. The SYNCHRONIZE access right is required.
- * @param Alertable If this parameter is TRUE, the function returns when the system queues an I/O completion routine or APC function, and the thread calls the function.
- * @param Timeout The time-out interval. The function returns if the interval elapses, even if the object's state is nonsignaled and no completion or APC objects are queued.
- * If zero, the function tests the object's state, checks for queued completion routines or APCs, and returns immediately. 
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-signalobjectandwait
+ * \param SignalHandle A handle to the object to be signaled.
+ * \param WaitHandle A handle to the object to wait on. The SYNCHRONIZE access right is required.
+ * \param Alertable If this parameter is TRUE, the function returns when the system queues an I/O completion routine or APC function, and the thread calls the function.
+ * \param Timeout The time-out interval. The function returns if the interval elapses, even if the object's state is nonsignaled and no completion or APC objects are queued.
+ * If zero, the function tests the object's state, checks for queued completion routines or APCs, and returns immediately.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-signalobjectandwait
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -306,14 +315,15 @@ NtSignalAndWaitForSingleObject(
 /**
  * The NtWaitForSingleObject routine waits until the specified object is in the signaled state or the time-out interval elapses.
  *
- * @param Handle The handle to the wait object.
- * @param Alertable The function returns when either the time-out period has elapsed or when the APC function is called.
- * @param Timeout A pointer to an absolute or relative time over which the wait is to occur. Can be null. If a timeout is specified,
+ * \param Handle The handle to the wait object.
+ * \param Alertable The function returns when either the time-out period has elapsed or when the APC function is called.
+ * \param Timeout A pointer to an absolute or relative time over which the wait is to occur. Can be null. If a timeout is specified,
  * and the object has not attained a state of signaled when the timeout expires, then the wait is automatically satisfied.
  * If an explicit timeout value of zero is specified, then no wait occurs if the wait cannot be satisfied immediately.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntwaitforsingleobject
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntwaitforsingleobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -326,16 +336,17 @@ NtWaitForSingleObject(
 /**
  * The NtWaitForMultipleObjects routine waits until one or all of the specified objects are in the signaled state, an I/O completion routine or asynchronous procedure call (APC) is queued to the thread, or the time-out interval elapses.
  *
- * @param Count The number of object handles to wait for in the array pointed to by lpHandles. The maximum number of object handles is MAXIMUM_WAIT_OBJECTS. This parameter cannot be zero.
- * @param Handles An array of object handles. The array can contain handles of objects of different types. It may not contain multiple copies of the same handle.
- * @param WaitType If this parameter is WaitAll, the function returns when the state of all objects in the Handles array is set to signaled.
- * @param Alertable f this parameter is TRUE and the thread is in the waiting state, the function returns when the system queues an I/O completion routine or APC, and the thread runs the routine or function.
- * @param Timeout A pointer to an absolute or relative time over which the wait is to occur. Can be null. If a timeout is specified,
+ * \param Count The number of object handles to wait for in the array pointed to by lpHandles. The maximum number of object handles is MAXIMUM_WAIT_OBJECTS. This parameter cannot be zero.
+ * \param Handles An array of object handles. The array can contain handles of objects of different types. It may not contain multiple copies of the same handle.
+ * \param WaitType If this parameter is WaitAll, the function returns when the state of all objects in the Handles array is set to signaled.
+ * \param Alertable f this parameter is TRUE and the thread is in the waiting state, the function returns when the system queues an I/O completion routine or APC, and the thread runs the routine or function.
+ * \param Timeout A pointer to an absolute or relative time over which the wait is to occur. Can be null. If a timeout is specified,
  * and the object has not attained a state of signaled when the timeout expires, then the wait is automatically satisfied.
  * If an explicit timeout value of zero is specified, then no wait occurs if the wait cannot be satisfied immediately.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjectsex
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-waitformultipleobjectsex
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -347,6 +358,7 @@ NtWaitForMultipleObjects(
     _In_opt_ PLARGE_INTEGER Timeout
     );
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -361,12 +373,13 @@ NtWaitForMultipleObjects32(
 /**
  * The NtSetSecurityObject routine sets an object's security state.
  *
- * @param Handle Handle for the object whose security state is to be set.
- * @param SecurityInformation A SECURITY_INFORMATION value specifying the information to be set.
- * @param SecurityDescriptor Pointer to the security descriptor to be set for the object.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwsetsecurityobject
+ * \param Handle Handle for the object whose security state is to be set.
+ * \param SecurityInformation A SECURITY_INFORMATION value specifying the information to be set.
+ * \param SecurityDescriptor Pointer to the security descriptor to be set for the object.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-zwsetsecurityobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -379,14 +392,15 @@ NtSetSecurityObject(
 /**
  * The NtQuerySecurityObject routine retrieves a copy of an object's security descriptor.
  *
- * @param Handle Handle for the object whose security descriptor is to be queried. 
- * @param SecurityInformation A SECURITY_INFORMATION value specifying the information to be queried.
- * @param SecurityDescriptor Caller-allocated buffer that NtQuerySecurityObject fills with a copy of the specified security descriptor.
- * @param Length Size, in bytes, of the buffer pointed to by SecurityDescriptor.
- * @param LengthNeeded Pointer to a caller-allocated variable that receives the number of bytes required to store the copied security descriptor.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerysecurityobject
+ * \param Handle Handle for the object whose security descriptor is to be queried.
+ * \param SecurityInformation A SECURITY_INFORMATION value specifying the information to be queried.
+ * \param SecurityDescriptor Caller-allocated buffer that NtQuerySecurityObject fills with a copy of the specified security descriptor.
+ * \param Length Size, in bytes, of the buffer pointed to by SecurityDescriptor.
+ * \param LengthNeeded Pointer to a caller-allocated variable that receives the number of bytes required to store the copied security descriptor.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-ntquerysecurityobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -401,10 +415,11 @@ NtQuerySecurityObject(
 /**
  * The NtClose routine closes the specified handle.
  *
- * @param Handle The handle being closed.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwclose
+ * \param Handle The handle being closed.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwclose
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -416,11 +431,12 @@ NtClose(
 /**
  * Compares two object handles to determine if they refer to the same underlying kernel object.
  *
- * @param FirstObjectHandle The first object handle to compare.
- * @param SecondObjectHandle The second object handle to compare.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-compareobjecthandles
+ * \param FirstObjectHandle The first object handle to compare.
+ * \param SecondObjectHandle The second object handle to compare.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-compareobjecthandles
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -441,12 +457,13 @@ NtCompareObjects(
 /**
  * The NtCreateDirectoryObject routine creates or opens an object-directory object.
  *
- * @param DirectoryHandle Pointer to a HANDLE variable that receives a handle to the object directory.
- * @param DesiredAccess An ACCESS_MASK that specifies the requested access to the directory object.
- * @param ObjectAttributes The attributes for the directory object.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatedirectoryobject
+ * \param DirectoryHandle Pointer to a HANDLE variable that receives a handle to the object directory.
+ * \param DesiredAccess An ACCESS_MASK that specifies the requested access to the directory object.
+ * \param ObjectAttributes The attributes for the directory object.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-zwcreatedirectoryobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -457,6 +474,7 @@ NtCreateDirectoryObject(
     );
 
 #if (PHNT_VERSION >= PHNT_WINDOWS_8)
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -471,13 +489,14 @@ NtCreateDirectoryObjectEx(
 
 /**
  * Opens an existing directory object.
- * 
- * @param DirectoryHandle A handle to the newly opened directory object.
- * @param DesiredAccess An ACCESS_MASK that specifies the requested access to the directory object.
- * @param ObjectAttributes The attributes for the directory object.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/devnotes/ntopendirectoryobject
+ *
+ * \param DirectoryHandle A handle to the newly opened directory object.
+ * \param DesiredAccess An ACCESS_MASK that specifies the requested access to the directory object.
+ * \param ObjectAttributes The attributes for the directory object.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/devnotes/ntopendirectoryobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -498,17 +517,18 @@ typedef struct _OBJECT_DIRECTORY_INFORMATION
 
 /**
  * Retrieves information about the specified directory object.
- * 
- * @param DirectoryHandle A handle to the directory object. This handle must have been opened with the appropriate access rights.
- * @param Buffer A pointer to a buffer that receives the directory information.
- * @param Length The size, in bytes, of the buffer pointed to by the Buffer parameter.
- * @param ReturnSingleEntry A BOOLEAN value that specifies whether to return a single entry or multiple entries.
- * @param RestartScan A BOOLEAN value that specifies whether to restart the scan from the beginning of the directory.
- * @param Context A pointer to a variable that maintains the context of the directory enumeration.
- * @param ReturnLength An optional pointer to a variable that receives the number of bytes returned in the buffer.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/devnotes/ntquerydirectoryobject
+ *
+ * \param DirectoryHandle A handle to the directory object. This handle must have been opened with the appropriate access rights.
+ * \param Buffer A pointer to a buffer that receives the directory information.
+ * \param Length The size, in bytes, of the buffer pointed to by the Buffer parameter.
+ * \param ReturnSingleEntry A BOOLEAN value that specifies whether to return a single entry or multiple entries.
+ * \param RestartScan A BOOLEAN value that specifies whether to restart the scan from the beginning of the directory.
+ * \param Context A pointer to a variable that maintains the context of the directory enumeration.
+ * \param ReturnLength An optional pointer to a variable that receives the number of bytes returned in the buffer.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/devnotes/ntquerydirectoryobject
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -533,23 +553,26 @@ NtQueryDirectoryObject(
 // private
 typedef enum _BOUNDARY_ENTRY_TYPE
 {
-    OBNS_Invalid,
-    OBNS_Name,
-    OBNS_SID,
-    OBNS_IL
+    BOUNDARY_ENTRY_TYPE_INVALID,
+    BOUNDARY_ENTRY_TYPE_NAME,
+    BOUNDARY_ENTRY_TYPE_SID,
+    BOUNDARY_ENTRY_TYPE_IL
 } BOUNDARY_ENTRY_TYPE;
+
+// private
+typedef union _OBJECT_BOUNDARY_VALUE
+{
+    WCHAR Name[1];
+    PSID Sid;
+    PSID IntegrityLabel;
+} OBJECT_BOUNDARY_VALUE, *POBJECT_BOUNDARY_VALUE;
 
 // private
 typedef struct _OBJECT_BOUNDARY_ENTRY
 {
-    BOUNDARY_ENTRY_TYPE EntryType;
-    ULONG EntrySize;
-    //union
-    //{
-    //    WCHAR Name[1];
-    //    PSID Sid;
-    //    PSID IntegrityLabel;
-    //};
+    BOUNDARY_ENTRY_TYPE Type;
+    ULONG Size;
+    // OBJECT_BOUNDARY_VALUE Value;
 } OBJECT_BOUNDARY_ENTRY, *POBJECT_BOUNDARY_ENTRY;
 
 // rev
@@ -576,13 +599,14 @@ typedef struct _OBJECT_BOUNDARY_DESCRIPTOR
 /**
  * Creates a private namespace.
  *
- * @param NamespaceHandle A handle to the newly created private namespace.
- * @param DesiredAccess An ACCESS_MASK that specifies the requested access to the private namespace.
- * @param ObjectAttributes The attributes for the private namespace.
- * @param BoundaryDescriptor A descriptor that defines how the namespace is to be isolated. The RtlCreateBoundaryDescriptor function creates a boundary descriptor.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createprivatenamespacea
+ * \param NamespaceHandle A handle to the newly created private namespace.
+ * \param DesiredAccess An ACCESS_MASK that specifies the requested access to the private namespace.
+ * \param ObjectAttributes The attributes for the private namespace.
+ * \param BoundaryDescriptor A descriptor that defines how the namespace is to be isolated. The RtlCreateBoundaryDescriptor function creates a boundary descriptor.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-createprivatenamespacea
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -596,13 +620,14 @@ NtCreatePrivateNamespace(
 /**
  * Opens a private namespace.
  *
- * @param NamespaceHandle A handle to the newly opened private namespace.
- * @param DesiredAccess An ACCESS_MASK that specifies the requested access to the private namespace.
- * @param ObjectAttributes The attributes for the private namespace.
- * @param BoundaryDescriptor A descriptor that defines how the namespace is to be isolated. The RtlCreateBoundaryDescriptor function creates a boundary descriptor.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openprivatenamespacea
+ * \param NamespaceHandle A handle to the newly opened private namespace.
+ * \param DesiredAccess An ACCESS_MASK that specifies the requested access to the private namespace.
+ * \param ObjectAttributes The attributes for the private namespace.
+ * \param BoundaryDescriptor A descriptor that defines how the namespace is to be isolated. The RtlCreateBoundaryDescriptor function creates a boundary descriptor.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-openprivatenamespacea
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -616,10 +641,11 @@ NtOpenPrivateNamespace(
 /**
  * Deletes an open namespace handle.
  *
- * @param NamespaceHandle A handle to the private namespace.
- * @return NTSTATUS Successful or errant status.
- * @sa https://learn.microsoft.com/en-us/windows/win32/api/namespaceapi/nf-namespaceapi-closeprivatenamespace
+ * \param NamespaceHandle A handle to the private namespace.
+ * \return NTSTATUS Successful or errant status.
+ * \sa https://learn.microsoft.com/en-us/windows/win32/api/namespaceapi/nf-namespaceapi-closeprivatenamespace
  */
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -635,6 +661,7 @@ NtDeletePrivateNamespace(
 
 #if (PHNT_MODE != PHNT_MODE_KERNEL)
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -645,6 +672,7 @@ NtCreateSymbolicLinkObject(
     _In_ PCUNICODE_STRING LinkTarget
     );
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -654,6 +682,7 @@ NtOpenSymbolicLinkObject(
     _In_ POBJECT_ATTRIBUTES ObjectAttributes
     );
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -671,6 +700,7 @@ typedef enum _SYMBOLIC_LINK_INFO_CLASS
 } SYMBOLIC_LINK_INFO_CLASS;
 
 #if (PHNT_VERSION >= PHNT_WINDOWS_10)
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI

@@ -20,9 +20,6 @@
 
 #include "clretw.h"
 
-
-int _QMap_QVariant_QVariantMap_type = qRegisterMetaType<QMap<QVariant, QVariantMap>>("QMap<QVariant, QVariantMap>");
-
 CAssemblyEnum::CAssemblyEnum(quint64 ProcessId, QObject* parent) : QThread(parent) 
 {
 	//m_bCancel = false;

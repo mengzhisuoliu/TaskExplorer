@@ -5,7 +5,7 @@
  *
  * Authors:
  *
- *     jxy-s   2023-2024
+ *     jxy-s   2023-2026
  *
  */
 
@@ -26,11 +26,12 @@ typedef struct _KPH_PARAMETER
 } KPH_PARAMETER, *PKPH_PARAMETER;
 
 KPH_PROTECTED_DATA_SECTION_RO_PUSH();
-static const UNICODE_STRING KphpDefaultAltitude = RTL_CONSTANT_STRING(L"385210.5");
-static const UNICODE_STRING KphpDefaultPortName = RTL_CONSTANT_STRING(L"\\KSystemInformer");
+static const UNICODE_STRING KphpDefaultAltitude = RTL_CONSTANT_STRING(L"385210.7");
+static const UNICODE_STRING KphpDefaultPortName = RTL_CONSTANT_STRING(L"\\KTaskExplorer");
 #ifdef IS_KTE
 static const UNICODE_STRING KphpDefaultClientPath = RTL_CONSTANT_STRING(L"");
 #endif
+static const UNICODE_STRING KphpDefaultSystemProcessName = RTL_CONSTANT_STRING(L"TaskExplorer Kernel");
 KPH_PROTECTED_DATA_SECTION_RO_POP();
 KPH_PROTECTED_DATA_SECTION_PUSH();
 PUNICODE_STRING KphAltitude = NULL;
@@ -39,6 +40,7 @@ KPH_PARAMETER_FLAGS KphParameterFlags = { .Flags = 0 };
 #ifdef IS_KTE
 PUNICODE_STRING KphClientPath = NULL;
 #endif
+PUNICODE_STRING KphSystemProcessName = NULL;
 C_ASSERT(sizeof(KPH_PARAMETER_FLAGS) == sizeof(ULONG));
 static KPH_PARAMETER KphpParameters[] =
 {
@@ -66,8 +68,14 @@ static KPH_PARAMETER KphpParameters[] =
         KphParameterTypeString,
         &KphClientPath,
         (PVOID)&KphpDefaultClientPath
-},
+    },
 #endif
+    {
+        RTL_CONSTANT_STRING(L"SystemProcessName"),
+        KphParameterTypeString,
+        &KphSystemProcessName,
+        (PVOID)&KphpDefaultSystemProcessName
+    },
 };
 KPH_PROTECTED_DATA_SECTION_POP();
 

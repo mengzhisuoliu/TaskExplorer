@@ -205,7 +205,7 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin\Release\$(PROCESSOR_ARCHITECTURE)\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
@@ -253,7 +253,7 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin\Release\$(PROCESSOR_ARCHITECTURE)\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -303,7 +303,7 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin\Release\$(PROCESSOR_ARCHITECTURE)\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -345,7 +345,7 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin\Release\$(PROCESSOR_ARCHITECTURE)\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
     </PostBuildEvent>
     <QtTranslation>
       <BuildAction>lupdate_lrelease</BuildAction>
@@ -391,7 +391,7 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin\Release\$(PROCESSOR_ARCHITECTURE)\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -436,7 +436,7 @@
       <QtRccFileName>qrc_%(Filename).cpp</QtRccFileName>
     </QtRcc>
     <PostBuildEvent>
-      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin\Release\$(PROCESSOR_ARCHITECTURE)\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -881,6 +881,17 @@
     <ClCompile Include="SVC\TaskService.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\clrdata.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\cor.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\corsym.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\dacprivate.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\dbgappdomain.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\ipcenums.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\ipcheader.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\ipcshared.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\perfcounterdefs.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\sospriv.h" />
+    <ClInclude Include="API\Windows\ProcessHacker\clr\xclrdata.h" />
     <ClInclude Include="API\Windows\WinHelper.h" />
     <ClInclude Include="API\Windows\WinHelpers\FindTool.h" />
     <ClInclude Include="API\Windows\WinHelpers\FuncHook\Detours\detours.h" />
@@ -1588,6 +1599,9 @@
     <QtTranslation Include="taskexplorer_pt.ts" />
     <QtTranslation Include="taskexplorer_tr.ts" />
     <QtTranslation Include="taskexplorer_zh_CN.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="API\Windows\ProcessHacker\clr\LICENSE.TXT" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

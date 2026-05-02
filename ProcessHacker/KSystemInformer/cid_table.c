@@ -5,7 +5,7 @@
  *
  * Authors:
  *
- *     jxy-s   2022-2024
+ *     jxy-s   2022-2026
  *
  */
 
@@ -35,6 +35,111 @@ C_ASSERT(KPH_CID_MAX == KPH_CID_LIMIT);
 #define KphpCidToId(x) ((ULONG_PTR)x / 4)
 
 /**
+ * \brief References the object in the table entry.
+ *
+ * \param[in,out] Entry The entry to reference the object of.
+ *
+ * \return Referenced object pointer, NULL if no object is assigned.
+ */
+_IRQL_requires_max_(HIGH_LEVEL)
+_Must_inspect_result_
+PVOID KphCidReferenceObject(
+    _In_ PKPH_CID_TABLE_ENTRY Entry
+    )
+{
+    KPH_NPAGED_CODE_HIGH_MAX();
+
+    return KphAtomicReferenceObject(&Entry->ObjectRef);
+}
+
+/**
+ * \brief Looks up an entry in the CID table.
+ *
+ * \param[in] Cid The CID to look up the entry of.
+ * \param[in] Table The table to look up the CID in.
+ *
+ * \return Pointer to the CID table entry, NULL if the table hasn't been
+ * expanded enough.
+ */
+_IRQL_requires_max_(HIGH_LEVEL)
+_Must_inspect_result_
+PKPH_CID_TABLE_ENTRY KphCidLookupEntry(
+    _In_ HANDLE Cid,
+    _In_ PKPH_CID_TABLE Table
+    )
+{
+    ULONG_PTR table;
+    PKPH_CID_TABLE_ENTRY tableL0;
+    PKPH_CID_TABLE_ENTRY* tableL1;
+    PKPH_CID_TABLE_ENTRY** tableL2;
+    ULONG_PTR id;
+
+    KPH_NPAGED_CODE_HIGH_MAX();
+
+    id = KphpCidToId(Cid);
+
+    table = ReadULongPtrAcquire(&Table->Table);
+
+    switch (table & KPH_CID_TABLE_LEVEL_MASK)
+    {
+        case KPH_CID_TABLE_L0:
+        {
+            if (id >= KPH_CID_MAX_L0)
+            {
+                return NULL;
+            }
+
+            tableL0 = (PKPH_CID_TABLE_ENTRY)(table & KPH_CID_TABLE_POINTER_MASK);
+
+            return &tableL0[id];
+        }
+        case KPH_CID_TABLE_L1:
+        {
+            if (id >= KPH_CID_MAX_L1)
+            {
+                return NULL;
+            }
+
+            tableL1 = (PKPH_CID_TABLE_ENTRY*)(table & KPH_CID_TABLE_POINTER_MASK);
+            tableL0 = tableL1[id / KPH_CID_MAX_L0];
+            if (!tableL0)
+            {
+                return NULL;
+            }
+
+            return &tableL0[id % KPH_CID_MAX_L0];
+        }
+        case KPH_CID_TABLE_L2:
+        {
+            if (id >= KPH_CID_MAX_L2)
+            {
+                return NULL;
+            }
+
+            tableL2 = (PKPH_CID_TABLE_ENTRY**)(table & KPH_CID_TABLE_POINTER_MASK);
+            tableL1 = tableL2[id / KPH_CID_MAX_L1];
+            if (!tableL1)
+            {
+                return NULL;
+            }
+
+            tableL0 = tableL1[(id % KPH_CID_MAX_L1) / KPH_CID_MAX_L0];
+            if (!tableL0)
+            {
+                return NULL;
+            }
+
+            return &tableL0[(id % KPH_CID_MAX_L1) % KPH_CID_MAX_L0];
+        }
+        default:
+        {
+            NT_ASSERT(FALSE);
+            return NULL;
+        }
+    }
+}
+
+/**
  * \brief Assigns an object to the table entry.
  *
  * \param[in,out] Entry The entry to assign to.
@@ -49,24 +154,6 @@ VOID KphCidAssignObject(
     KPH_NPAGED_CODE_DISPATCH_MAX();
 
     KphAtomicAssignObjectReference(&Entry->ObjectRef, Object);
-}
-
-/**
- * \brief References the object in the table entry.
- *
- * \param[in,out] Entry The entry to reference the object of.
- *
- * \return Referenced object pointer, NULL if no object is assigned.
- */
-_IRQL_requires_max_(DISPATCH_LEVEL)
-_Must_inspect_result_
-PVOID KphCidReferenceObject(
-    _In_ PKPH_CID_TABLE_ENTRY Entry
-    )
-{
-    KPH_NPAGED_CODE_DISPATCH_MAX();
-
-    return KphAtomicReferenceObject(&Entry->ObjectRef);
 }
 
 /**
@@ -165,7 +252,7 @@ VOID KphCidTableDelete(
 
     switch (tableCode & KPH_CID_TABLE_LEVEL_MASK)
     {
-        case 0:
+        case KPH_CID_TABLE_L0:
         {
             tableL0 = (PKPH_CID_TABLE_ENTRY)(tableCode & KPH_CID_TABLE_POINTER_MASK);
 
@@ -175,7 +262,7 @@ VOID KphCidTableDelete(
 
             break;
         }
-        case 1:
+        case KPH_CID_TABLE_L1:
         {
             tableL1 = (PKPH_CID_TABLE_ENTRY*)(tableCode & KPH_CID_TABLE_POINTER_MASK);
 
@@ -194,7 +281,7 @@ VOID KphCidTableDelete(
 
             break;
         }
-        case 2:
+        case KPH_CID_TABLE_L2:
         {
             tableL2 = (PKPH_CID_TABLE_ENTRY**)(tableCode & KPH_CID_TABLE_POINTER_MASK);
 
@@ -233,101 +320,12 @@ VOID KphCidTableDelete(
 }
 
 /**
- * \brief Looks up an entry in the CID table.
- *
- * \param[in] Cid The CID to look up the entry of.
- * \param[in] Table The table to look up the CID in.
- *
- * \return Pointer to the CID table entry, null if the table hasn't been
- * expanded enough.
- */
-_IRQL_requires_max_(DISPATCH_LEVEL)
-PKPH_CID_TABLE_ENTRY KphpCidLookupEntry(
-    _In_ HANDLE Cid,
-    _In_ PKPH_CID_TABLE Table
-    )
-{
-    ULONG_PTR table;
-    PKPH_CID_TABLE_ENTRY tableL0;
-    PKPH_CID_TABLE_ENTRY* tableL1;
-    PKPH_CID_TABLE_ENTRY** tableL2;
-    ULONG_PTR id;
-
-    KPH_NPAGED_CODE_DISPATCH_MAX();
-
-    id = KphpCidToId(Cid);
-
-    //
-    // N.B. Capture the volatile table pointer. This is a lock-free lookup.
-    //
-    table = ReadULongPtrAcquire(&Table->Table);
-
-    switch (table & KPH_CID_TABLE_LEVEL_MASK)
-    {
-        case KPH_CID_TABLE_L0:
-        {
-            if (id >= KPH_CID_MAX_L0)
-            {
-                return NULL;
-            }
-
-            tableL0 = (PKPH_CID_TABLE_ENTRY)(table & KPH_CID_TABLE_POINTER_MASK);
-
-            return &tableL0[id];
-        }
-        case KPH_CID_TABLE_L1:
-        {
-            if (id >= KPH_CID_MAX_L1)
-            {
-                return NULL;
-            }
-
-            tableL1 = (PKPH_CID_TABLE_ENTRY*)(table & KPH_CID_TABLE_POINTER_MASK);
-            tableL0 = tableL1[id / KPH_CID_MAX_L0];
-            if (!tableL0)
-            {
-                return NULL;
-            }
-
-            return &tableL0[id % KPH_CID_MAX_L0];
-        }
-        case KPH_CID_TABLE_L2:
-        {
-            if (id >= KPH_CID_MAX_L2)
-            {
-                return NULL;
-            }
-
-            tableL2 = (PKPH_CID_TABLE_ENTRY**)(table & KPH_CID_TABLE_POINTER_MASK);
-            tableL1 = tableL2[id / KPH_CID_MAX_L1];
-            if (!tableL1)
-            {
-                return NULL;
-            }
-
-            tableL0 = tableL1[(id % KPH_CID_MAX_L1) / KPH_CID_MAX_L0];
-            if (!tableL0)
-            {
-                return NULL;
-            }
-
-            return &tableL0[(id % KPH_CID_MAX_L1) % KPH_CID_MAX_L0];
-        }
-        default:
-        {
-            NT_ASSERT(FALSE);
-            return NULL;
-        }
-    }
-}
-
-/**
  * \brief Expands a CID table making it capable of holding an entry for a CID.
  *
  * \param[in] Cid The CID for which the table should be expanded for.
  * \param[in,out] Table The table that should be expanded to hold the CID.
  *
- * \return Pointer to the table entry for the CID, null on allocation failure.
+ * \return Pointer to the table entry for the CID, NULL on allocation failure.
  */
 _IRQL_requires_max_(DISPATCH_LEVEL)
 PKPH_CID_TABLE_ENTRY KphpCidExpandTableFor(
@@ -366,7 +364,7 @@ PKPH_CID_TABLE_ENTRY KphpCidExpandTableFor(
     //
     // See if another thread beat us.
     //
-    entry = KphpCidLookupEntry(Cid, Table);
+    entry = KphCidLookupEntry(Cid, Table);
     if (entry)
     {
         //
@@ -487,7 +485,7 @@ Exit:
 }
 
 /**
- * \brief Retrieves the table entry for a given CID.
+ * \brief Retrieves the table entry for a given CID, expands the table if needed.
  *
  * \param[in] Cid The CID to retrieve the entry for.
  * \param[in,out] Table The table to retrieve the entry from.
@@ -505,7 +503,7 @@ PKPH_CID_TABLE_ENTRY KphCidGetEntry(
 
     KPH_NPAGED_CODE_DISPATCH_MAX();
 
-    entry = KphpCidLookupEntry(Cid, Table);
+    entry = KphCidLookupEntry(Cid, Table);
     if (entry)
     {
         return entry;
@@ -519,7 +517,7 @@ PKPH_CID_TABLE_ENTRY KphCidGetEntry(
  *
  * \param[in] Entry The CID table entry to invoke the callback for.
  * \param[in] Callback The object callback to invoke.
- * \param[in] CallbackEx The extended callback to invoke.
+ * \param[in] Rundown The rundown callback to invoke.
  * \param[in] Parameter Optional parameter passed to the callback.
  *
  * \return TRUE if enumeration should stop, FALSE otherwise.
@@ -573,7 +571,7 @@ BOOLEAN KphpCidEnumerateInvokeCallback(
  *
  * \param[in] Table The table to enumerate.
  * \param[in] Callback The object callback to invoke.
- * \param[in] CallbackEx The extended callback to invoke.
+ * \param[in] Rundown The rundown callback to invoke.
  * \param[in] Parameter Optional parameter passed to the callback.
  */
 _IRQL_requires_max_(DISPATCH_LEVEL)
@@ -734,10 +732,11 @@ VOID KphCidEnumerate(
  * \brief Enumerates CID entries a CID table for rundown.
  *
  * \details This routine removes all items from the table. After the callback
- * returns the object reference in the table is dereferenced.
+ * returns all object references in the table is dereferenced and removed from
+ * the table.
  *
  * \param[in] Table The table to enumerate.
- * \param[in] Callback The extended callback to invoke.
+ * \param[in] Callback The rundown callback to invoke.
  * \param[in] Parameter Optional parameter passed to the callback.
  */
 _IRQL_requires_max_(DISPATCH_LEVEL)

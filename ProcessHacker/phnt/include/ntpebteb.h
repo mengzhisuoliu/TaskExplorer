@@ -7,9 +7,16 @@
 #ifndef _NTPEBTEB_H
 #define _NTPEBTEB_H
 
+#ifdef __has_include
+#if __has_include (<ntgdi.h>)
 #include <ntgdi.h>
+#endif // __has_include
+#if __has_include (<ntsxs.h>)
 #include <ntsxs.h>
+#endif // __has_include
+#endif // __has_include
 
+typedef struct _APPCOMPAT_EXE_DATA APPCOMPAT_EXE_DATA, *PAPPCOMPAT_EXE_DATA;
 typedef struct _RTL_USER_PROCESS_PARAMETERS *PRTL_USER_PROCESS_PARAMETERS;
 typedef struct _RTL_CRITICAL_SECTION *PRTL_CRITICAL_SECTION;
 typedef struct _SILO_USER_SHARED_DATA *PSILO_USER_SHARED_DATA;
@@ -17,14 +24,17 @@ typedef struct _LDR_RESLOADER_RET LDR_RESLOADER_RET, *PLDR_RESLOADER_RET;
 typedef struct _LEAP_SECOND_DATA *PLEAP_SECOND_DATA;
 typedef struct _PEB_LDR_DATA PEB_LDR_DATA, *PPEB_LDR_DATA;
 typedef struct tagSOleTlsData SOleTlsData, *PSOleTlsData;
-typedef struct _APPCOMPAT_EXE_DATA APPCOMPAT_EXE_DATA, *PAPPCOMPAT_EXE_DATA;
 typedef struct _KERNEL_CALLBACK_TABLE KERNEL_CALLBACK_TABLE, *PKERNEL_CALLBACK_TABLE;
+typedef struct _GDI_HANDLE_ENTRY GDI_HANDLE_ENTRY, *PGDI_HANDLE_ENTRY;
+typedef struct _SHIM_PROCESS_CONTEXT SHIM_PROCESS_CONTEXT, *PSHIM_PROCESS_CONTEXT;
+typedef struct _HEAP HEAP, *PHEAP;
 
 // PEB->AppCompatFlags
 #define KACF_OLDGETSHORTPATHNAME                      0x00000001
 #define KACF_VERSIONLIE_NOT_USED                      0x00000002
 #define KACF_GETTEMPPATH_NOT_USED                     0x00000004
 #define KACF_GETDISKFREESPACE                         0x00000008
+#define KACF_APPCOMPATFLAG_BIT4                       0x00000010
 #define KACF_FTMFROMCURRENTAPT                        0x00000020
 #define KACF_DISALLOWORBINDINGCHANGES                 0x00000040
 #define KACF_OLE32VALIDATEPTRS                        0x00000080
@@ -39,13 +49,28 @@ typedef struct _KERNEL_CALLBACK_TABLE KERNEL_CALLBACK_TABLE, *PKERNEL_CALLBACK_T
 #define KACF_OLE32DOCFILEUSELEGACYNTFSFLAGS           0x00010000
 #define KACF_RPCDISABLENDRCONSTIIDCHECK               0x00020000
 #define KACF_USERDISABLEFORWARDERPATCH                0x00040000
+#define KACF_APPCOMPATFLAG_BIT19                      0x00080000
 #define KACF_OLE32DISABLENEW_WMPAINT_DISPATCH         0x00100000
 #define KACF_ADDRESTRICTEDSIDINCOINITIALIZESECURITY   0x00200000
 #define KACF_ALLOCDEBUGINFOFORCRITSECTIONS            0x00400000
 #define KACF_OLEAUT32ENABLEUNSAFELOADTYPELIBRELATIVE  0x00800000
 #define KACF_ALLOWMAXIMIZEDWINDOWGAMMA                0x01000000
 #define KACF_DONOTADDTOCACHE                          0x80000000
-#define KACF_DISABLEPOSIXDELETEFILE                  0x100000000 // rev KernelBase!InternalDeleteFileW
+#define KACF_DISABLEPOSIXDELETEFILE                   0x100000000 // rev KernelBase!InternalDeleteFileW
+#define KACF_ENABLE_PROCESS_SYSTEMDPIAWARENESS        0x20000000000000 // rev // Enable Per-Process System DPI Awareness and Opt-in to Per-Process System DPI mode.
+#define KACF_DISABLE_PROCESS_SYSTEMDPIAWARENESS       0x40000000000000 // rev // Disable Per-Process System DPI Awareness and force legacy DPI behavior.
+#define KACF_ENABLE_GDI_DPI_SCALING                   0x800000000000000
+#define KACF_FORCE_DISABLE_GDI_SCALING                0x4000000000000000
+
+// PEB->CrossProcessFlags
+#define PEB_FLAG_PROCESS_IN_JOB                       0x00000001 // Process is part of a job
+#define PEB_FLAG_PROCESS_INITIALIZING                 0x00000002 // Process is initializing
+#define PEB_FLAG_PROCESS_USING_VEH                    0x00000004 // Process is using VEH
+#define PEB_FLAG_PROCESS_USING_VCH                    0x00000008 // Process is using VCH
+#define PEB_FLAG_PROCESS_USING_FTH                    0x00000010 // Process is using FTH
+#define PEB_FLAG_PROCESS_PREVIOUSLY_THROTTLED         0x00000020 // Process was previously throttled
+#define PEB_FLAG_PROCESS_CURRENTLY_THROTTLED          0x00000040 // Process is currently throttled
+#define PEB_FLAG_PROCESS_IMAGES_HOT_PATCHED           0x00000080 // Process images are hot patched (RS5+)
 
 // private
 #define API_SET_SECTION_NAME ".apiset"
@@ -387,7 +412,7 @@ typedef struct _PEB
     //
     // Pointer to the process default heap.
     //
-    PVOID ProcessHeap;
+    PHEAP ProcessHeap;
 
     //
     // Pointer to a critical section used to synchronize access to the PEB.
@@ -687,7 +712,7 @@ typedef struct _PEB
     //
     // Pointer to the Application SwitchBack Compatibility Engine.
     //
-    PVOID pShimData;
+    PSHIM_PROCESS_CONTEXT pShimData;
 
     //
     // Pointer to the Application Compatibility Engine.
@@ -946,6 +971,57 @@ typedef struct _TEB_ACTIVE_FRAME_EX
 #define STATIC_UNICODE_BUFFER_LENGTH 261
 #define WIN32_CLIENT_INFO_LENGTH 62
 
+#if (PHNT_MODE != PHNT_MODE_KERNEL)
+// private
+typedef struct _CALLBACKWND
+{
+    HWND hwnd;
+    ULONG_PTR pwnd;
+    PACTIVATION_CONTEXT ActCtx;
+} CALLBACKWND, *PCALLBACKWND;
+
+// private
+typedef struct tagDPICONTEXTINFO
+{
+    ULONG dpiContext;
+    LOGICAL Dirty;
+} DPICONTEXTINFO, *PDPICONTEXTINFO;
+
+// private + rev
+typedef struct tagCLIENTINFO
+{
+    ULONG_PTR CI_flags;
+    ULONG_PTR Spins;
+    ULONG ExpWinVer;
+    ULONG CompatFlags;
+    ULONG CompatFlags2;
+    ULONG TIFlags;
+    struct tagDESKTOPINFO* DeskInfo;
+    PVOID DesktopBase; // ClientDelta before RS2
+    HHOOK hkCurrent;
+    ULONG Hooks;
+    CALLBACKWND CallbackWnd;
+    ULONG HookCurrent;
+    LONG InDDEMLCallback;
+    struct tagCLIENTTHREADINFO* ClientThreadInfo;
+    ULONG_PTR HookData;
+    ULONG KeyCache;
+    UCHAR KeyState[8];
+    ULONG AsyncKeyCache;
+    UCHAR AsyncKeyState[8];
+    UCHAR AsyncKeyStateRecentDown[8];
+    HKL hKL;
+    USHORT CodePage;
+    UCHAR DbcsCFOld[2];
+    UCHAR DbcsCFNew[2];
+    MSG msgDbcsCB;
+    PULONG RegisteredClasses;
+    HANDLE mmcssHandle;
+    ULONG_PTR CI_exflags;
+    DPICONTEXTINFO dci;
+} CLIENTINFO, *PCLIENTINFO;
+#endif // (PHNT_MODE != PHNT_MODE_KERNEL)
+
 // rev - xor key for ReservedForNtRpc
 #ifdef _WIN64
 #define RPC_THREAD_POINTER_KEY 0xABABABABDEDEDEDEui64
@@ -1009,7 +1085,7 @@ typedef struct _TEB
     // Reserved for win32k.sys
     //
     PVOID Win32ThreadInfo;
- 
+
     //
     // Reserved for user32.dll
     //
@@ -1158,10 +1234,18 @@ typedef struct _TEB
     ULONG GdiClientTID;
     PVOID GdiThreadLocalInfo;
 
-    //
-    // Reserved for User32 (Win32k).
-    //
+#if (PHNT_MODE != PHNT_MODE_KERNEL)
+    union
+    {
+        //
+        // User32 (Win32k) thread information.
+        //
+        CLIENTINFO Win32ClientInfo;
+        ULONG_PTR Win32ClientInfoArea[WIN32_CLIENT_INFO_LENGTH];
+    };
+#else
     ULONG_PTR Win32ClientInfo[WIN32_CLIENT_INFO_LENGTH];
+#endif
 
     //
     // Reserved for opengl32.dll

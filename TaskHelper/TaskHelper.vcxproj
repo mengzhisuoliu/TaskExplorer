@@ -108,6 +108,9 @@
       <AdditionalDependencies>..\ProcessHacker\phlib\bin\Debug32\phlib.lib;ntdll.lib;winhttp.lib;iphlpapi.lib;ws2_32.lib;%(AdditionalDependencies);Gdi32.lib;gdiplus.lib</AdditionalDependencies>
       <DelayLoadDLLs>Comctl32.dll</DelayLoadDLLs>
     </Link>
+    <PostBuildEvent>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -127,6 +130,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Comctl32.dll</DelayLoadDLLs>
     </Link>
+    <PostBuildEvent>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -142,6 +148,9 @@
       <AdditionalDependencies>..\ProcessHacker\phlib\bin\Debug64\phlib.lib;ntdll.lib;winhttp.lib;iphlpapi.lib;ws2_32.lib;%(AdditionalDependencies);Gdi32.lib;gdiplus.lib</AdditionalDependencies>
       <DelayLoadDLLs>Comctl32.dll</DelayLoadDLLs>
     </Link>
+    <PostBuildEvent>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -161,6 +170,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Comctl32.dll</DelayLoadDLLs>
     </Link>
+    <PostBuildEvent>
+      <Command>cmd /c "cd "$(SolutionDir)ProcessHacker\" &amp; "$(SolutionDir)ProcessHacker\tools\CustomBuildTool\bin_old\Release\AMD64\CustomBuildTool.exe" -kph-sign "$(OutDir)$(TargetName)$(TargetExt)""</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\TaskExplorer\Common\Buffer.cpp" />

@@ -7,12 +7,17 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 
-## [1.7.2] - 2025-12-??
 
+## [1.8.0] - 2026-05-02
+
+### Changed
+- updated PHlib to version 4.0.26115
+ 
 ### Fixed
 - fixed crash issue on start up affecting soeme systems
 - fixed job object name display issue
 - fixed click "SYSTEM_IDLE_PROCESS_ID" will crash. [#116](https://github.com/DavidXanatos/TaskExplorer/issues/116)
+
 
 
 

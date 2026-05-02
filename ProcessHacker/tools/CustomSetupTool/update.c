@@ -11,28 +11,58 @@
 
 #include "setup.h"
 
+_Function_class_(USER_THREAD_START_ROUTINE)
 NTSTATUS CALLBACK SetupUpdateBuild(
     _In_ PPH_SETUP_CONTEXT Context
     )
 {
     NTSTATUS status;
 
+    //
     // Create the folder.
+    //
+
     if (!NT_SUCCESS(status = PhCreateDirectoryWin32(&Context->SetupInstallPath->sr)))
     {
         Context->LastStatus = status;
         goto CleanupExit;
     }
 
+    //
     // Stop the application.
+    //
+
     if (!NT_SUCCESS(status = SetupShutdownApplication(Context)))
     {
         Context->LastStatus = status;
         goto CleanupExit;
     }
 
+    //
     // Stop the kernel driver.
+    //
+
     if (!NT_SUCCESS(status = SetupUninstallDriver(Context)))
+    {
+        Context->LastStatus = status;
+        goto CleanupExit;
+    }
+
+    //
+    // Create the uninstaller.
+    //
+
+    if (!NT_SUCCESS(status = SetupCreateUninstallFile(Context)))
+    {
+        Context->LastStatus = status;
+        goto CleanupExit;
+    }
+
+    //
+    // Extract the updated files.
+    //
+
+    if (!NT_SUCCESS(status = SetupExtractBuild(Context)))
     {
         Context->LastStatus = status;
         goto CleanupExit;
@@ -40,38 +70,18 @@ NTSTATUS CALLBACK SetupUpdateBuild(
 
     // Upgrade the settings file.
     SetupUpgradeSettingsFile();
+
     // Convert the settings file.
     SetupConvertSettingsFile();
 
-    // Remove the previous installation.
-    //if (Context->SetupResetSettings)
-    //    PhDeleteDirectory(Context->SetupInstallPath);
-
-    // Create the uninstaller.
-    if (!NT_SUCCESS(status = SetupCreateUninstallFile(Context)))
-    {
-        Context->LastStatus = status;
-        goto CleanupExit;
-    }
-
-    // Create the ARP uninstall entries.
+    // Create the ARP uninstall config.
     SetupCreateUninstallKey(Context);
 
-    // Create autorun.
+    // Create Windows Error Reporting config.
+    SetupCreateLocalDumpsKey();
+
+    // Create the application path config.
     SetupCreateWindowsOptions(Context);
-
-    // Create shortcuts.
-    //SetupCreateShortcuts(Context);
-
-    // Set the default image execution options.
-    //SetupCreateImageFileExecutionOptions();
-
-    // Extract the updated files.
-    if (!NT_SUCCESS(status = SetupExtractBuild(Context)))
-    {
-        Context->LastStatus = status;
-        goto CleanupExit;
-    }
 
     PostMessage(Context->DialogHandle, SETUP_SHOWUPDATEFINAL, 0, 0);
     return STATUS_SUCCESS;

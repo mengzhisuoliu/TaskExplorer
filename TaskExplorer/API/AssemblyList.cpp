@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "AssemblyList.h"
 
-int _CAssemblyListPtr_type = qRegisterMetaType<CAssemblyListPtr>("CAssemblyListPtr");
-
 CAssemblyList::CAssemblyList()
 {
 

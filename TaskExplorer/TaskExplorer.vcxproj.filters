@@ -108,6 +108,9 @@
     <Filter Include="API\Windows\WinHelpers\FuncHook\Detours">
       <UniqueIdentifier>{2a689bdf-52b9-4bd1-a07f-60ea8699e800}</UniqueIdentifier>
     </Filter>
+    <Filter Include="API\Windows\ProcessHacker\clr">
+      <UniqueIdentifier>{bf717e83-96b4-4171-8e48-9c6526b41603}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -889,6 +892,39 @@
     <ClInclude Include="API\Windows\WinHelper.h">
       <Filter>API\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\clrdata.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\cor.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\corsym.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\dacprivate.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\dbgappdomain.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\ipcenums.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\ipcheader.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\ipcshared.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\perfcounterdefs.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\sospriv.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
+    <ClInclude Include="API\Windows\ProcessHacker\clr\xclrdata.h">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="API\SystemAPI.h">
@@ -1398,5 +1434,10 @@
     <QtTranslation Include="taskexplorer_pt.ts">
       <Filter>Translation Files</Filter>
     </QtTranslation>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="API\Windows\ProcessHacker\clr\LICENSE.TXT">
+      <Filter>API\Windows\ProcessHacker\clr</Filter>
+    </Text>
   </ItemGroup>
 </Project>

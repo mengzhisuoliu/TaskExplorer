@@ -247,7 +247,6 @@ VOID PhInitializeWindowTheme(
 
         PhEnumChildWindows(
             WindowHandle,
-            0x1000,
             PhpThemeWindowEnumChildWindows,
             NULL
             );
@@ -303,7 +302,6 @@ VOID PhReInitializeWindowTheme(
 
     PhEnumChildWindows(
         WindowHandle,
-        0x1000,
         PhpReInitializeThemeWindowEnumChildWindows,
         NULL
         );
@@ -331,7 +329,6 @@ VOID PhReInitializeWindowTheme(
                     {
                         PhEnumChildWindows(
                             currentWindow,
-                            0x1000,
                             PhpReInitializeThemeWindowEnumChildWindows,
                             NULL
                             );
@@ -573,7 +570,7 @@ HBRUSH PhWindowThemeControlColor(
         break;
     }
 
-    return (HBRUSH)DefWindowProc(WindowHandle, Type, (WPARAM)Hdc, (LPARAM)ChildWindowHandle);
+    return GetSysColorBrush(COLOR_WINDOW);
 }
 
 VOID PhWindowThemeMainMenuBorder(
@@ -622,12 +619,12 @@ VOID PhInitializeThemeWindowTabControl(
     PPHP_THEME_WINDOW_TAB_CONTEXT context;
 
     context = PhAllocateZero(sizeof(PHP_THEME_WINDOW_TAB_CONTEXT));
-    context->DefaultWindowProc = (WNDPROC)GetWindowLongPtr(TabControlWindow, GWLP_WNDPROC);
+    context->DefaultWindowProc = PhGetWindowProcedure(TabControlWindow);
     context->CursorPos.x = LONG_MIN;
     context->CursorPos.y = LONG_MIN;
 
     PhSetWindowContext(TabControlWindow, LONG_MAX, context);
-    SetWindowLongPtr(TabControlWindow, GWLP_WNDPROC, (LONG_PTR)PhpThemeWindowTabControlWndSubclassProc);
+    PhSetWindowProcedure(TabControlWindow, PhpThemeWindowTabControlWndSubclassProc);
 
     InvalidateRect(TabControlWindow, NULL, FALSE);
 }
@@ -638,9 +635,11 @@ VOID PhInitializeThemeWindowGroupBox(
 {
     WNDPROC groupboxWindowProc;
 
-    groupboxWindowProc = (WNDPROC)GetWindowLongPtr(GroupBoxHandle, GWLP_WNDPROC);
+    groupboxWindowProc = PhGetWindowProcedure(GroupBoxHandle);
     PhSetWindowContext(GroupBoxHandle, LONG_MAX, groupboxWindowProc);
-    SetWindowLongPtr(GroupBoxHandle, GWLP_WNDPROC, (LONG_PTR)PhpThemeWindowGroupBoxSubclassProc);
+    PhSetWindowProcedure(GroupBoxHandle, PhpThemeWindowGroupBoxSubclassProc);
+
+    PhSetWindowStyle(GroupBoxHandle, WS_CLIPSIBLINGS, WS_CLIPSIBLINGS);
 
     InvalidateRect(GroupBoxHandle, NULL, FALSE);
 }
@@ -702,8 +701,8 @@ VOID PhInitializeWindowThemeACLUI(
     _In_ HWND ACLUIControl
 )
 {
-    PhSetWindowContext(ACLUIControl, LONG_MAX, (PVOID)GetWindowLongPtr(ACLUIControl, GWLP_WNDPROC));
-    SetWindowLongPtr(ACLUIControl, GWLP_WNDPROC, (LONG_PTR)PhpThemeWindowACLUISubclassProc);
+    PhSetWindowContext(ACLUIControl, LONG_MAX, PhGetWindowProcedure(ACLUIControl));
+    PhSetWindowProcedure(ACLUIControl, PhpThemeWindowACLUISubclassProc);
 
     InvalidateRect(ACLUIControl, NULL, FALSE);
 }
@@ -718,7 +717,6 @@ BOOLEAN CALLBACK PhpThemeWindowEnumChildWindows(
 
     PhEnumChildWindows(
         WindowHandle,
-        0x1000,
         PhpThemeWindowEnumChildWindows,
         NULL
         );
@@ -936,7 +934,7 @@ BOOLEAN CALLBACK PhpThemeWindowEnumChildWindows(
     else if (PhEqualStringZ(windowClassName, WC_EDIT, FALSE))
     {
         // Fix scrollbar on multiline edit (Dart Vanya)
-        if (GetWindowLongPtr(WindowHandle, GWL_STYLE) & ES_MULTILINE)
+        if (PhGetWindowStyle(WindowHandle) & ES_MULTILINE)
         {
             PhWindowThemeSetDarkMode(WindowHandle, TRUE);
         }
@@ -960,7 +958,6 @@ BOOLEAN CALLBACK PhpReInitializeThemeWindowEnumChildWindows(
 
     PhEnumChildWindows(
         WindowHandle,
-        0x1000,
         PhpReInitializeThemeWindowEnumChildWindows,
         NULL
         );
@@ -1618,7 +1615,7 @@ LRESULT CALLBACK PhThemeWindowDrawButton(
     _In_ LPNMCUSTOMDRAW DrawInfo
     )
 {
-    LONG_PTR buttonStyle;
+    ULONG buttonStyle;
 
     buttonStyle = PhGetWindowStyle(DrawInfo->hdr.hwndFrom);
     // COMMANDLINK unsupported
@@ -2475,7 +2472,7 @@ LRESULT CALLBACK PhpThemeWindowGroupBoxSubclassProc(
 
             ThemeWindowRenderGroupBoxControl(WindowHandle, hdc, &clientRect, oldWndProc);
         }
-        return TRUE;
+        return DefWindowProc(WindowHandle, uMsg, wParam, lParam);
     case WM_ENABLE:
         if (!wParam)    // fix drawing when window visible and switches to disabled
             return 0;
@@ -2593,7 +2590,7 @@ VOID ThemeWindowRenderTabControl(
         itemRect.bottom += itemRect.bottom + 1 < headerBottom ? 1 : -1;
         itemRect.right += itemRect.right + 1 < clientRect->right;
 
-        if (PhPtInRect(&itemRect, Context->CursorPos))
+        if (PhPtInRect(&itemRect, &Context->CursorPos))
         {
             //switch (PhpThemeColorMode)
             //{
@@ -2674,7 +2671,7 @@ VOID ThemeWindowRenderTabControl(
         itemRect.right += itemRect.right + 1 < clientRect->right;
         PhInflateRect(&itemRect, 1, 1);     // draw selected tab slightly bigger
         itemRect.bottom -= 1;
-        SetDCBrushColor(bufferDc, PhPtInRect(&itemRect, Context->CursorPos) ? PhThemeWindowHighlightColor : RGB(0x50, 0x50, 0x50));
+        SetDCBrushColor(bufferDc, PhPtInRect(&itemRect, &Context->CursorPos) ? PhThemeWindowHighlightColor : RGB(0x50, 0x50, 0x50));
         FillRect(bufferDc, &itemRect, PhGetStockBrush(DC_BRUSH));
 
         if (TabCtrl_GetItem(WindowHandle, currentSelection, &tabItem))
@@ -2987,7 +2984,7 @@ LRESULT CALLBACK PhpThemeWindowListBoxControlSubclassProc(
             if (updateRegion == HRGN_FULL)
                 updateRegion = NULL;
 
-            flags = DCX_WINDOW | DCX_LOCKWINDOWUPDATE | DCX_USESTYLE;
+            flags = DCX_WINDOW | DCX_CACHE | DCX_USESTYLE;
 
             if (updateRegion)
                 flags |= DCX_INTERSECTRGN | DCX_NODELETERGN;
@@ -3050,7 +3047,7 @@ VOID ThemeWindowRenderComboBox(
        clientRect->right - clientRect->left,
        clientRect->bottom - clientRect->top
     };
-    LONG_PTR windowStyle = PhGetWindowStyle(WindowHandle);
+    ULONG windowStyle = PhGetWindowStyle(WindowHandle);
     //BOOLEAN isFocused = GetFocus() == WindowHandle;
 
     SetBkMode(bufferDc, TRANSPARENT);
@@ -3058,7 +3055,7 @@ VOID ThemeWindowRenderComboBox(
     SetDCBrushColor(bufferDc, PhThemeWindowBackground2Color);
     FillRect(bufferDc, clientRect, PhGetStockBrush(DC_BRUSH));
 
-    if (PhPtInRect(clientRect, Context->CursorPos))
+    if (PhPtInRect(clientRect, &Context->CursorPos))
     {
         SetDCBrushColor(bufferDc, PhThemeWindowHighlight2Color); // RGB(0, 120, 212) : RGB(68, 68, 68));
     }
@@ -3142,7 +3139,7 @@ VOID ThemeWindowComboBoxExcludeRect(
     _In_ WNDPROC WindowProcedure
     )
 {
-    LONG_PTR windowStyle = PhGetWindowStyle(WindowHandle);
+    ULONG windowStyle = PhGetWindowStyle(WindowHandle);
 
     if ((windowStyle & CBS_DROPDOWNLIST) != CBS_DROPDOWNLIST || (windowStyle & CBS_DROPDOWN) != CBS_DROPDOWN)
     {

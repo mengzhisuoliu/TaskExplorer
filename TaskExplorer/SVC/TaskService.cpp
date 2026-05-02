@@ -842,7 +842,7 @@ bool CTaskService::RunService(const QString& ServiceName, QString BinaryPath)
 
 		std::wstring CommandLine = L"\"" + BinaryPath.toStdWString() + L"\" -svc \"" + ServiceName.toStdWString() + L"\"";
 #if _DEBUG
-		//CommandLine.append(L" -timeout 50000");
+		CommandLine.append(L" -timeout 50000");
 		//CommandLine.append(L" -dbg_wait");
 #else
 		CommandLine.append(L" -timeout 5000");

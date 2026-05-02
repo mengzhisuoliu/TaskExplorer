@@ -585,7 +585,7 @@ typedef struct _LDR_SECTION_INFO
 typedef struct _LDR_VERIFY_IMAGE_INFO
 {
     ULONG Size;
-    ULONG Flags; // LDR_VERIFY_IMAGE_FLAG_* 
+    ULONG Flags; // LDR_VERIFY_IMAGE_FLAG_*
     LDR_IMPORT_CALLBACK_INFO CallbackInfo;
     LDR_SECTION_INFO SectionInfo;
     USHORT ImageCharacteristics;
@@ -746,6 +746,7 @@ typedef struct _PS_MITIGATION_AUDIT_OPTIONS_MAP_V3
     PS_MITIGATION_AUDIT_OPTIONS_MAP, *PPS_MITIGATION_AUDIT_OPTIONS_MAP;
 
 // private // WIN8 to REDSTONE
+_Struct_size_bytes_(Size)
 typedef struct _PS_SYSTEM_DLL_INIT_BLOCK_V1
 {
     ULONG Size;
@@ -770,6 +771,7 @@ typedef struct _PS_SYSTEM_DLL_INIT_BLOCK_V1
 } PS_SYSTEM_DLL_INIT_BLOCK_V1, *PPS_SYSTEM_DLL_INIT_BLOCK_V1;
 
 // RS2 - 19H2
+_Struct_size_bytes_(Size)
 typedef struct _PS_SYSTEM_DLL_INIT_BLOCK_V2
 {
     ULONG Size;
@@ -795,6 +797,7 @@ typedef struct _PS_SYSTEM_DLL_INIT_BLOCK_V2
 } PS_SYSTEM_DLL_INIT_BLOCK_V2, *PPS_SYSTEM_DLL_INIT_BLOCK_V2;
 
 // private // since 20H1
+_Struct_size_bytes_(Size)
 typedef struct _PS_SYSTEM_DLL_INIT_BLOCK_V3
 {
     ULONG Size;
@@ -1114,29 +1117,29 @@ LdrpResGetResourceDirectory(
 
 // rev
 /**
-* The LdrResSearchResource function searches for a resource in a DLL.
-*
-* \param DllHandle A handle to the DLL.
-* \param ResourcePath A pointer to an array of Type/Name/Language/(optional)AlternateType.
-* \param Count The number of elements in the ResourcePath array.
-* \param Flags Flags for the resource search.
-* \param ResourceBuffer An optional pointer to receive the resource buffer.
-* \param ResourceLength An optional pointer to receive the resource length.
-* \param CultureName An optional buffer to receive the culture name.
-* \param CultureNameLength An optional pointer to receive the length of the culture name.
-* \return NTSTATUS Successful or errant status.
-*/
+ * The LdrResSearchResource function searches for a resource in a DLL.
+ *
+ * \param DllHandle A handle to the DLL.
+ * \param ResourcePath A pointer to an array of Type/Name/Language/(optional)AlternateType.
+ * \param ResourcePathCount The number of elements in the ResourcePath array.
+ * \param Flags Flags for the resource search.
+ * \param ResourceBuffer An optional pointer to receive the resource buffer.
+ * \param ResourceLength An optional pointer to receive the resource length.
+ * \param CultureName An optional buffer to receive the culture name.
+ * \param CultureNameLength An optional pointer to receive the length of the culture name.
+ * \return NTSTATUS Successful or errant status.
+ */
 NTSYSAPI
 NTSTATUS
 NTAPI
 LdrResSearchResource(
     _In_ PVOID DllHandle,
-    _In_reads_(Count) PULONG_PTR ResourcePath,
-    _In_ ULONG Count,
+    _In_ PULONG_PTR ResourcePath,
+    _In_ ULONG ResourcePathCount,
     _In_ ULONG Flags,
     _Out_opt_ PVOID* ResourceBuffer,
     _Out_opt_ PSIZE_T ResourceLength,
-    _Out_writes_bytes_opt_(*CultureNameLength) PVOID CultureName, // WCHAR buffer[6]
+    _Out_writes_bytes_opt_(*CultureNameLength) PWSTR CultureName, // WCHAR buffer[6]
     _Out_opt_ PULONG CultureNameLength
     );
 
@@ -1259,7 +1262,7 @@ typedef struct _LDR_ENUM_RESOURCE_ENTRY
 } LDR_ENUM_RESOURCE_ENTRY, *PLDR_ENUM_RESOURCE_ENTRY;
 
 #define NAME_FROM_RESOURCE_ENTRY(RootDirectory, Entry) \
-    ((Entry)->NameIsString ? (ULONG_PTR)((ULONG_PTR)(RootDirectory) + (ULONG_PTR)((Entry)->NameOffset)) : (Entry)->Id)
+    ((Entry)->NameIsString ? (ULONG_PTR)((PUCHAR)(RootDirectory) + (ULONG_PTR)((Entry)->NameOffset)) : (Entry)->Id)
 
 FORCEINLINE
 ULONG_PTR
@@ -1269,9 +1272,9 @@ LdrNameOrIdFromResourceEntry(
     _In_ PIMAGE_RESOURCE_DIRECTORY_ENTRY Entry)
 {
     if (Entry->NameIsString)
-        return (ULONG_PTR)((ULONG_PTR)ResourceDirectory + (ULONG_PTR)Entry->NameOffset);
+        return (ULONG_PTR)((PUCHAR)(ResourceDirectory) + (ULONG_PTR)(Entry->NameOffset));
     else
-        return (ULONG_PTR)Entry->Id;
+        return (ULONG_PTR)(Entry->Id);
 }
 
 /**
@@ -1858,7 +1861,8 @@ LdrCallEnclave(
 /**
  * The LdrLoadEnclaveModule routine loads an image and all of its imports into an enclave.
  *
- * \param BaseAddress The base address of the image into which to load the image.
+ * \param BaseAddress The base address of the enclave in which the module will be loaded.
+ * This address must correspond to an enclave previously created by using LdrCreateEnclave.
  * \param DllPath A NULL-terminated string that contains the path of the image to load.
  * \param DllName A NULL-terminated string that contains the name of the image to load.
  * \return NTSTATUS Successful or errant status.

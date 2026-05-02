@@ -4,4 +4,8 @@
     <LocalDebuggerCommandArguments>commit /path:C:\Projects\TaskExplorer\Installer\Build /version:1.7.0</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>commit /path:C:\Projects\TaskExplorer\Installer\Build /version:1.7.1</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

@@ -23,6 +23,7 @@
     <TemplateGuid>{dd38f7fc-d7bd-488b-9242-7d8754cde80d}</TemplateGuid>
     <ConfigurationType>Driver</ConfigurationType>
     <RootNamespace>KSystemInformer</RootNamespace>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -37,7 +38,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalDependencies>ksi.lib;FltMgr.lib;ksecdd.lib;kphlib_km.lib;volatileaccessk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kte.lib;FltMgr.lib;ksecdd.lib;kphlib_km.lib;volatileaccessk.lib;umaccess.lib%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <ResourceCompile>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SystemInformerRoot)kphlib\include\</AdditionalIncludeDirectories>
@@ -50,9 +51,19 @@
     </DriverSign>
     <ClCompile>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">KERNEL_DEBUG;_ARM64_;ARM64;_USE_DECLSPECS_FOR_SAL=1;STD_CALL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <ClCompile>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">KERNEL_DEBUG;_WIN64;_AMD64_;AMD64;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile />
+    <ClCompile />
+    <ClCompile>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -79,20 +90,24 @@
     <ClCompile Include="informer_process.c" />
     <ClCompile Include="informer.c" />
     <ClCompile Include="informer_registry.c" />
+    <ClCompile Include="informer_silo.c" />
     <ClCompile Include="informer_thread.c" />
     <ClCompile Include="knowndll.c" />
     <ClCompile Include="kphobject.c" />
+    <ClCompile Include="kphthread.c" />
     <ClCompile Include="lsa.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="object.c" />
     <ClCompile Include="parameters.c" />
     <ClCompile Include="process.c" />
     <ClCompile Include="protection.c" />
+    <ClCompile Include="ratelmt.c" />
+    <ClCompile Include="ringbuff.c" />
     <ClCompile Include="session_token.c" />
     <ClCompile Include="system.c" />
     <ClCompile Include="thread.c" />
+    <ClCompile Include="umaccess.c" />
     <ClCompile Include="util.c" />
-    <ClCompile Include="verification_queue.c" />
     <ClCompile Include="verify.c" />
     <ClCompile Include="vm.c" />
   </ItemGroup>

@@ -11,30 +11,40 @@
 
 #include "setup.h"
 
+_Function_class_(USER_THREAD_START_ROUTINE)
 NTSTATUS CALLBACK SetupUninstallBuild(
     _In_ PPH_SETUP_CONTEXT Context
     )
 {
     NTSTATUS status;
 
+    //
     // Stop the application.
+    //
+
     if (!NT_SUCCESS(status = SetupShutdownApplication(Context)))
     {
         Context->LastStatus = status;
         goto CleanupExit;
     }
 
+    //
     // Stop the kernel driver.
+    //
+
     if (!NT_SUCCESS(status = SetupUninstallDriver(Context)))
     {
         Context->LastStatus = status;
         goto CleanupExit;
     }
 
-    // Remove autorun.
+    // Remove all Windows Options (registry cleanup)
     SetupDeleteWindowsOptions(Context);
 
-    // Remove shortcuts.
+    // Remove Windows Error Reporting.
+    SetupDeleteLocalDumpsKey();
+
+    // Remove all shortcuts.
     SetupDeleteShortcuts(Context);
 
     // Remove the uninstaller.

@@ -121,8 +121,12 @@ void CDriverWindow::Refresh()
 				Info.append("unsigned images (likely an unsigned plugin)");
 			if (!BooleanFlagOn(processState, KPH_PROCESS_NOT_BEING_DEBUGGED))
 				Info.append("process is being debugged");
-			if (!BooleanFlagOn(processState, KPH_PROCESS_NO_VERIFY_TIMEOUT))
-				Info.append("verify time out");
+			if (!BooleanFlagOn(processState, KPH_PROCESS_NO_WRITABLE_FILE_OBJECT))
+				Info.append("writable file object");
+			if (!BooleanFlagOn(processState, KPH_PROCESS_CREATE_NOTIFICATION))
+				Info.append("missing create notification");
+			//if (!BooleanFlagOn(processState, KPH_PROCESS_NO_VERIFY_TIMEOUT))
+			//	Info.append("verify time out");
 			if ((processState & KPH_PROCESS_STATE_MINIMUM) != KPH_PROCESS_STATE_MINIMUM)
 				Info.append("tampered primary image");
 		}

@@ -146,6 +146,12 @@ typedef struct _PH_TREENEW_CONTEXT
     ULONG SearchStringCount;
     ULONG AllocatedSearchString;
 
+    ULONG VScrollAnchorFlags;
+    PPH_TREENEW_NODE VScrollAnchorNode;
+    ULONG FlatListStructureChanged;
+    ULONG FlatListPreCount;   // flat list count captured before PhTnpRestructureNodes clears the list
+    ULONG FlatListAnchorEnd;  // TRUE when the END scroll anchor was active for the current structural change
+
     ULONG TooltipIndex;
     ULONG TooltipId;
     PPH_STRING TooltipText;
@@ -199,9 +205,14 @@ typedef struct _PH_TREENEW_CONTEXT
             ULONG HeaderCustomDraw : 1;
             ULONG HeaderMouseActive : 1;
             ULONG HeaderDragging : 1;
-            ULONG HeaderUnused : 28;
+            ULONG HeaderUnused : 12;
 
             ULONG FillerBoxVisible : 1;
+            ULONG ReorderDragActive : 1;
+            ULONG ReorderJustStarted : 1;
+            ULONG TooltipVisible : 1;
+            ULONG TooltipActive : 1;
+            ULONG SpareUnused : 12;
         };
     };
 
@@ -220,29 +231,32 @@ typedef struct _PH_TREENEW_CONTEXT
     PPH_STRINGREF HeaderStringCache;
     PVOID HeaderTextCache;
 
+    HANDLE UniqueThread;
+
     ULONG64 ScrollTickCount;
 
+    HDC SelectionScratchDc;
+    HBITMAP SelectionScratchBitmap;
+    HBITMAP SelectionScratchOldBitmap;
+
     // Drag-reorder support
-    BOOLEAN ReorderDragActive;
-    BOOLEAN ReorderJustStarted;
     ULONG   ReorderSourceIndex;   // source row index in FlatList
     ULONG   ReorderTargetIndex;   // target row index under caret
     BOOLEAN ReorderDropAfter;     // caret drops after the target row
     RECT    ReorderInsertRect;    // last drawn caret invalidation
     HCURSOR ReorderCursor;        // optional cursor during reorder
-
 } PH_TREENEW_CONTEXT, *PPH_TREENEW_CONTEXT;
 
 LRESULT CALLBACK PhTnpWndProc(
-    _In_ HWND hwnd,
-    _In_ UINT uMsg,
+    _In_ HWND WindowHandle,
+    _In_ UINT WindowMessage,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam
     );
 
 _Function_class_(PH_TREENEW_CALLBACK)
 BOOLEAN NTAPI PhTnpNullCallback(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PH_TREENEW_MESSAGE Message,
     _In_opt_ PVOID Parameter1,
     _In_opt_ PVOID Parameter2,
@@ -260,54 +274,54 @@ VOID PhTnpDestroyTreeNewContext(
 // Event handlers
 
 BOOLEAN PhTnpOnCreate(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ CONST CREATESTRUCT *CreateStruct
     );
 
 VOID PhTnpOnSize(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
 VOID PhTnpOnSetFont(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_opt_ HFONT Font,
     _In_ LOGICAL Redraw
     );
 
 VOID PhTnpOnStyleChanged(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ LONG Type,
     _In_ STYLESTRUCT *StyleStruct
     );
 
 VOID PhTnpOnSettingChange(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
 VOID PhTnpOnThemeChanged(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
 VOID PhTnpOnDpiChanged(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
 ULONG PhTnpOnGetDlgCode(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG VirtualKey,
     _In_opt_ PMSG Message
     );
 
 VOID PhTnpOnPaint(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
@@ -325,7 +339,7 @@ BOOLEAN PhTnpOnNcPaint(
     );
 
 BOOLEAN PhTnpOnSetCursor(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ HWND CursorWindowHandle,
     _In_ ULONG HitTest,
@@ -333,7 +347,7 @@ BOOLEAN PhTnpOnSetCursor(
     );
 
 VOID PhTnpOnTimer(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG Id
     );
@@ -347,12 +361,12 @@ VOID PhTnpOnMouseMove(
     );
 
 VOID PhTnpOnMouseLeave(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
 VOID PhTnpOnXxxButtonXxx(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG Message,
     _In_ ULONG VirtualKeys,
@@ -361,26 +375,26 @@ VOID PhTnpOnXxxButtonXxx(
     );
 
 VOID PhTnpOnCaptureChanged(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context
     );
 
 VOID PhTnpOnKeyDown(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG VirtualKey,
     _In_ ULONG Data
     );
 
 VOID PhTnpOnChar(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG Character,
     _In_ ULONG Data
     );
 
 VOID PhTnpOnMouseWheel(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ LONG Distance,
     _In_ ULONG VirtualKeys,
@@ -389,7 +403,7 @@ VOID PhTnpOnMouseWheel(
     );
 
 VOID PhTnpOnMouseHWheel(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ LONG Distance,
     _In_ ULONG VirtualKeys,
@@ -398,21 +412,21 @@ VOID PhTnpOnMouseHWheel(
     );
 
 VOID PhTnpOnContextMenu(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ LONG CursorScreenX,
     _In_ LONG CursorScreenY
     );
 
 VOID PhTnpOnVScroll(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG Request,
     _In_ USHORT Position
     );
 
 VOID PhTnpOnHScroll(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG Request,
     _In_ USHORT Position
@@ -420,14 +434,14 @@ VOID PhTnpOnHScroll(
 
 _Success_(return)
 BOOLEAN PhTnpOnNotify(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ NMHDR *Header,
     _Out_ LRESULT *Result
     );
 
 LRESULT PhTnpOnUserMessage(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ ULONG Message,
     _In_ ULONG_PTR WParam,
@@ -490,7 +504,62 @@ VOID PhTnpSendMouseEvent(
     _In_ ULONG VirtualKeys
     );
 
+//
+// Scroll Anchoring
+//
+
+// Scroll anchoring is when a scrolling control automatically changes the position
+// of its viewport to prevent the content from visibly jumping.
+//
+// The jump is caused by a change in the content's layout. The scroll anchor provider
+// applies a shift after observing a change in the position of an anchor element within the content.
+//
+// The treenew control now snapshots the current viewport anchor before structural updates,
+// restores it after the flat list is rebuilt, and special-cases the start/end edges
+// so bottom-pinned views track appended content.
+//
+// Caveat: middle-of-list anchoring is pointer-identity based.
+//
+// It works when callers keep node objects stable across refreshes,
+// but if a view destroys and recreates all nodes on each rebuild, only the start / end
+// edge anchors will function correctly. Node-based anchoring requires that the same
+// PPH_TREENEW_NODE pointer remains valid and present in the new flat list.
+//
+// Source for expected behavior :
+// https://learn.microsoft.com/en-us/uwp/api/windows.ui.xaml.controls.iscrollanchorprovider
+
+#define TREENEW_VSCROLL_ANCHOR 1
+#define PH_TREENEW_VSCROLL_ANCHOR_PENDING 0x1
+#define PH_TREENEW_VSCROLL_ANCHOR_START 0x2
+#define PH_TREENEW_VSCROLL_ANCHOR_END 0x4
+#define PH_TREENEW_VSCROLL_ANCHOR_NODE 0x8
+
+LONG PhTnpGetMaxVScrollPosition(
+    _In_ ULONG Count,
+    _In_ LONG RowsPerPage
+    );
+
+_Success_(return)
+BOOLEAN PhTnpFindFlatListNode(
+    _In_ PPH_TREENEW_CONTEXT Context,
+    _In_ PPH_TREENEW_NODE Node,
+    _Out_ PULONG Index
+    );
+
+VOID PhTnpPrepareVScrollAnchor(
+    _In_ PPH_TREENEW_CONTEXT Context
+    );
+
+_Success_(return)
+BOOLEAN PhTnpGetAnchoredVScrollPosition(
+    _In_ PPH_TREENEW_CONTEXT Context,
+    _In_ LONG RowsPerPage,
+    _Out_ PLONG Position
+    );
+
+//
 // Columns
+//
 
 PPH_TREENEW_COLUMN PhTnpLookupColumnById(
     _In_ PPH_TREENEW_CONTEXT Context,
@@ -738,7 +807,7 @@ BOOLEAN PhTnpCanScroll(
 // Drawing
 
 VOID PhTnpPaint(
-    _In_ HWND hwnd,
+    _In_ HWND WindowHandle,
     _In_ PPH_TREENEW_CONTEXT Context,
     _In_ HDC hdc,
     _In_ PRECT PaintRect
@@ -782,6 +851,14 @@ VOID PhTnpDrawThemedBorder(
     _In_ HDC hdc
     );
 
+BOOLEAN PhTnpSelectionCreateBufferedContext(
+    _In_ PPH_TREENEW_CONTEXT Context
+    );
+
+VOID PhTnpSelectionDestroyBufferedContext(
+    _In_ PPH_TREENEW_CONTEXT Context
+    );
+
 // Tooltips
 
 VOID PhTnpInitializeTooltips(
@@ -823,8 +900,8 @@ BOOLEAN PhTnpGetHeaderTooltipText(
     );
 
 LRESULT CALLBACK PhTnpHeaderHookWndProc(
-    _In_ HWND hwnd,
-    _In_ UINT uMsg,
+    _In_ HWND WindowHandle,
+    _In_ UINT WindowMessage,
     _In_ WPARAM wParam,
     _In_ LPARAM lParam
     );
@@ -899,12 +976,6 @@ VOID PhTnpDestroyBufferedContext(
     );
 
 // Support functions
-
-_Success_(return)
-BOOLEAN PhTnpGetMessagePos(
-    _In_ HWND WindowHandle,
-    _Out_ PPOINT ClientPoint
-    );
 
 _Success_(return)
 BOOLEAN PhTnpGetColumnHeaderText(

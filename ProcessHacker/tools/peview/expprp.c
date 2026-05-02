@@ -176,7 +176,7 @@ PPH_HASHTABLE PvPeCreateSuppressedGuardHashtable(
             }
         }
 
-        for (ULONGLONG i = 0; i < cfgConfig.NumberOfGuardAdressIatEntries; i++)
+        for (ULONGLONG i = 0; i < cfgConfig.NumberOfGuardAddressIatEntries; i++)
         {
             IMAGE_CFG_ENTRY cfgFunctionEntry = { 0 };
 
@@ -312,7 +312,7 @@ NTSTATUS PvpPeExportsEnumerateThread(
                     {
                         exportSymbol = PhGetSymbolFromAddress(
                             PvSymbolProvider,
-                            PTR_ADD_OFFSET(PvMappedImage.NtHeaders32->OptionalHeader.ImageBase, exportFunction.Function),
+                            PTR_ADD_OFFSET(UlongToPtr(PvMappedImage.NtHeaders32->OptionalHeader.ImageBase), exportFunction.Function),
                             NULL,
                             NULL,
                             &exportSymbolName,
@@ -824,7 +824,7 @@ BOOLEAN NTAPI PvExportTreeNewCallback(
 
             if (!getChildren->Node)
             {
-                static PVOID sortFunctions[] =
+                static CONST _CoreCrtSecureSearchSortCompareFunction sortFunctions[] =
                 {
                     SORT_FUNCTION(Index),
                     SORT_FUNCTION(RVA),
@@ -836,7 +836,7 @@ BOOLEAN NTAPI PvExportTreeNewCallback(
                     SORT_FUNCTION(Supression),
                     SORT_FUNCTION(UndecoratedName),
                 };
-                int (__cdecl *sortFunction)(void *, const void *, const void *);
+                _CoreCrtSecureSearchSortCompareFunction sortFunction;
 
                 static_assert(RTL_NUMBER_OF(sortFunctions) == PV_EXPORT_TREE_COLUMN_ITEM_MAXIMUM, "SortFunctions must equal maximum.");
 

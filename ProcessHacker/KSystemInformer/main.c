@@ -6,7 +6,7 @@
  * Authors:
  *
  *     wj32    2010-2016
- *     jxy-s   2021-2024
+ *     jxy-s   2021-2026
  *
  */
 
@@ -83,9 +83,7 @@ VOID KphpDriverCleanup(
 {
     KPH_PAGED_CODE_PASSIVE();
 
-#ifdef IS_KTE
-    KteStopWorkerThread();
-#endif
+    KphSiloInformerStop();
     KphDebugInformerStop();
     KphRegistryInformerStop();
     KphObjectInformerStop();
@@ -95,12 +93,11 @@ VOID KphpDriverCleanup(
     KphProcessInformerStop();
     KphFltUnregister();
     KphCidCleanup();
-#ifdef IS_KTE
-    KteCleanupVerificationQueue();
-#endif 
+    KphCleanupInformer();
     KphCleanupDynData();
     KphCleanupVerify();
     KphCleanupHashing();
+    KphCleanupThreading();
     KphCleanupParameters();
 
     KsiUninitialize(DriverObject, 0);
@@ -198,33 +195,17 @@ NTSTATUS DriverEntry(
         RtlZeroMemory(&KphCodeIntegrityInfo, sizeof(KphCodeIntegrityInfo));
     }
 
-#ifdef IS_KTE
-    KphInitializeParameters(RegistryPath);
-#endif
-
     if (KphInDeveloperMode())
     {
         KphTracePrint(TRACE_LEVEL_INFORMATION, GENERAL, "Developer Mode");
     }
 
     KphDynamicImport();
-
     KphObjectInitialize();
-
-#ifndef IS_KTE
+    KphInitializeRingBuffer();
     KphInitializeParameters(RegistryPath);
-#endif
-
-    status = KphInitializeAlloc();
-    if (!NT_SUCCESS(status))
-    {
-        KphTracePrint(TRACE_LEVEL_ERROR,
-                      GENERAL,
-                      "KphInitializeAlloc failed: %!STATUS!",
-                      status);
-
-        goto Exit;
-    }
+    KphInitializeAlloc();
+    KphInitializeThreading();
 
     status = KphInitializeKnownDll();
     if (!NT_SUCCESS(status))
@@ -242,7 +223,7 @@ NTSTATUS DriverEntry(
     {
         KphTracePrint(TRACE_LEVEL_ERROR,
                       GENERAL,
-                      "KphLocateKernelRevision failed: %!STATUS!",
+                      "KphGetKernelVersion failed: %!STATUS!",
                       status);
 
         goto Exit;
@@ -281,22 +262,8 @@ NTSTATUS DriverEntry(
         goto Exit;
     }
 
-#ifdef IS_KTE
-    status = KteInitializeVerificationQueue();
-    if (!NT_SUCCESS(status))
-    {
-        KphTracePrint(TRACE_LEVEL_ERROR,
-                      GENERAL,
-                      "Failed to initialize verification queue: %!STATUS!",
-                      status);
-        goto Exit;
-    }
-#endif
-
     KphInitializeDynData();
-
     KphInitializeProtection();
-
     KphInitializeSessionToken();
 
     status = KphInitializeStackBackTrace();
@@ -305,6 +272,17 @@ NTSTATUS DriverEntry(
         KphTracePrint(TRACE_LEVEL_ERROR,
                       GENERAL,
                       "Failed to initialize stack back trace: %!STATUS!",
+                      status);
+
+        goto Exit;
+    }
+
+    status = KphInitializeInformer();
+    if (!NT_SUCCESS(status))
+    {
+        KphTracePrint(TRACE_LEVEL_ERROR,
+                      GENERAL,
+                      "Failed to initialize informer: %!STATUS!",
                       status);
 
         goto Exit;
@@ -412,17 +390,15 @@ NTSTATUS DriverEntry(
         goto Exit;
     }
 
-#ifdef IS_KTE
-    status = KteStartWorkerThread();
+    status = KphSiloInformerStart();
     if (!NT_SUCCESS(status))
     {
         KphTracePrint(TRACE_LEVEL_ERROR,
                       GENERAL,
-                      "Failed to start worker thread : %!STATUS!",
+                      "Failed to start silo informer: %!STATUS!",
                       status);
         goto Exit;
     }
-#endif
 
     KphpProtectSections();
 
@@ -481,95 +457,3 @@ void KphTracePrint(ULONG level, ULONG event, const char* message, ...)
     va_end(args);
 #endif
 }
-
-#ifdef IS_KTE
-
-PKEVENT KteWorkEvent = NULL;
-volatile LONG KteStopWorker = 0;
-PKTHREAD KteWorkerThread = NULL;
-
-#define TIMER_INTERVAL_MS 100
-
-static VOID KteWorkerThreadRoutineFunc(PVOID StartContext)
-{
-    UNREFERENCED_PARAMETER(StartContext);
-
-    for (;;) 
-    {
-        LARGE_INTEGER timeout;
-        timeout.QuadPart = -((LONGLONG)TIMER_INTERVAL_MS * 10000LL);
-        NTSTATUS status = KeWaitForSingleObject(KteWorkEvent, Executive, KernelMode, FALSE, &timeout);
-
-        if (InterlockedCompareExchange(&KteStopWorker, 0, 0) != 0)
-            break;
-
-        if (status == STATUS_SUCCESS)
-        {
-            //
-            // The work event was signaled (triggered externally).
-            //
-			
-            KteProcessVerificationQueue();
-        }
-        else if (status == STATUS_TIMEOUT)
-        {
-            //
-            // Timeout => perform periodic work:
-            //
-
-            KteCleanupProcesses();
-        }
-    }
-
-    PsTerminateSystemThread(STATUS_SUCCESS);
-    // not reached
-}
-
-NTSTATUS KteStartWorkerThread()
-{
-    NTSTATUS status;
-    HANDLE threadHandle;
-
-    KteWorkEvent = (PKEVENT)KphAllocateNPaged(sizeof(KEVENT), KPH_TAG_THREAD_POOL);
-    if(!KteWorkEvent) 
-        return STATUS_INSUFFICIENT_RESOURCES;
-    KeInitializeEvent(KteWorkEvent, SynchronizationEvent, FALSE);
-
-    InterlockedExchange(&KteStopWorker, 0);
-
-    status = PsCreateSystemThread(&threadHandle, THREAD_ALL_ACCESS, NULL, NULL, NULL, KteWorkerThreadRoutineFunc, NULL);
-    if (!NT_SUCCESS(status))
-        return status;
-
-    status = ObReferenceObjectByHandle(threadHandle, THREAD_ALL_ACCESS, *PsThreadType, KernelMode, (PVOID*)&KteWorkerThread, NULL);
-    NT_ASSERT(NT_SUCCESS(status));
-    ObCloseHandle(threadHandle, KernelMode);
-
-    return status;
-}
-
-void KteStopWorkerThread()
-{
-    if(!KteWorkEvent)
-        return;
-
-    InterlockedExchange(&KteStopWorker, 1);
-
-    KeSetEvent(KteWorkEvent, IO_NO_INCREMENT, FALSE);
-
-    if (KteWorkerThread)
-    {
-        KeWaitForSingleObject(KteWorkerThread, Executive, KernelMode, FALSE, NULL);
-        ObDereferenceObject(KteWorkerThread);
-        KteWorkerThread = NULL;
-    }
-
-    KphFree(KteWorkEvent, KPH_TAG_THREAD_POOL);
-    KteWorkEvent = NULL;
-}
-
-void KteTriggerWorkerThread()
-{
-    KeSetEvent(KteWorkEvent, IO_NO_INCREMENT, FALSE);
-}
-#endif

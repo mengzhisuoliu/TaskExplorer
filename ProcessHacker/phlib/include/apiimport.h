@@ -13,6 +13,7 @@
 #ifndef _PH_APIIMPORT_H
 #define _PH_APIIMPORT_H
 
+#include <devquery.h>
 #include <sddl.h>
 //#include <shlwapi.h>
 #include <userenv.h>
@@ -245,6 +246,12 @@ typedef NTSTATUS (WINAPI* _PssNtFreeRemoteSnapshot)(
     _In_ HANDLE SnapshotHandle
     );
 
+typedef NTSTATUS (WINAPI* _PssNtValidateDescriptor)(
+    _In_ HANDLE SnapshotHandle,
+    _In_opt_ PVOID ExceptionAddress //  _ReturnAddress()
+    );
+
+
 typedef NTSTATUS (WINAPI* _PssNtQuerySnapshot)(
     _In_ HANDLE SnapshotHandle,
     _In_ PSSNT_QUERY_INFORMATION_CLASS InformationClass,
@@ -447,7 +454,11 @@ typedef HRESULT (STDAPICALLTYPE* _CreateXmlWriter)(_In_ REFIID riid,
 
 EXTERN_C_START
 
+#ifndef IS_TE
+#define PH_DECLARE_IMPORT(Name) typeof(&(Name)) Name##_Import(VOID)
+#else
 #define PH_DECLARE_IMPORT(Name) _##Name NTAPI Name##_Import(VOID)
+#endif
 
 // Ntdll
 
@@ -461,11 +472,17 @@ PH_DECLARE_IMPORT(NtCreateThreadStateChange);
 PH_DECLARE_IMPORT(NtChangeThreadState);
 PH_DECLARE_IMPORT(NtCopyFileChunk);
 PH_DECLARE_IMPORT(NtCompareObjects);
+#ifndef IS_TE
+PH_DECLARE_IMPORT(NtCreateTimer2);
+PH_DECLARE_IMPORT(NtSetTimer2);
+#endif
 
 PH_DECLARE_IMPORT(NtSetInformationVirtualMemory);
 PH_DECLARE_IMPORT(LdrSystemDllInitBlock);
 PH_DECLARE_IMPORT(LdrResFindResource);
-
+#ifndef IS_TE
+PH_DECLARE_IMPORT(LdrResSearchResource);
+#endif
 PH_DECLARE_IMPORT(RtlDefaultNpAcl);
 PH_DECLARE_IMPORT(RtlDelayExecution);
 PH_DECLARE_IMPORT(RtlDeriveCapabilitySidsFromName);
@@ -479,7 +496,11 @@ PH_DECLARE_IMPORT(PssNtCaptureSnapshot);
 PH_DECLARE_IMPORT(PssNtQuerySnapshot);
 PH_DECLARE_IMPORT(PssNtFreeSnapshot);
 PH_DECLARE_IMPORT(PssNtFreeRemoteSnapshot);
+PH_DECLARE_IMPORT(PssNtValidateDescriptor);
 PH_DECLARE_IMPORT(NtPssCaptureVaSpaceBulk);
+#ifndef IS_TE
+PH_DECLARE_IMPORT(TpSetPoolThreadBasePriority);
+#endif
 
 // Advapi32
 
@@ -497,8 +518,8 @@ PH_DECLARE_IMPORT(DevCloseObjectQuery);
 
 // Shlwapi
 
-PH_DECLARE_IMPORT(SHAutoComplete);
-PH_DECLARE_IMPORT(SHCreateStreamOnFileEx);
+//PH_DECLARE_IMPORT(SHAutoComplete);
+//PH_DECLARE_IMPORT(SHCreateStreamOnFileEx);
 
 // Userenv
 
@@ -510,6 +531,11 @@ PH_DECLARE_IMPORT(GetAppContainerFolderPath);
 // User32
 
 PH_DECLARE_IMPORT(ConsoleControl);
+#ifndef IS_TE
+PH_DECLARE_IMPORT(GetCurrentInputMessageSource);
+PH_DECLARE_IMPORT(GetCIMSSM);
+PH_DECLARE_IMPORT(NtUserBuildHwndList);
+#endif
 
 // Xmllite
 

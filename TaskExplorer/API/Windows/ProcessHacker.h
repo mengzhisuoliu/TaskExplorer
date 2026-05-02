@@ -7,7 +7,7 @@
 #endif
 
 #ifdef _DEBUG
-#define DEBUG
+#define DEBUG 1
 #endif
 
 #ifdef WIN64

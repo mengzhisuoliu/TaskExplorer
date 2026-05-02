@@ -887,6 +887,7 @@ PPH_STRING PhpGetTokenRegistryPath(
 }
 
 extern "C" {
+#define IS_TE
 #include <apiimport.h>
 }
 

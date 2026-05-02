@@ -10,11 +10,6 @@
 
 CSystemAPI*	theAPI = NULL;
 
-int _QHostAddress_type = qRegisterMetaType<QHostAddress>("QHostAddress");
-
-int _QSet_qquint64ype = qRegisterMetaType<QSet<quint64>>("QSet<quint64>");
-int _QSet_QString_type = qRegisterMetaType<QSet<QString>>("QSet<QString>");
-
 // When running this in a separate thread, QObject parent must be NULL
 CSystemAPI::CSystemAPI(QObject *parent) 
 {

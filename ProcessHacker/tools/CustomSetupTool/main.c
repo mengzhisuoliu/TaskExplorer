@@ -367,6 +367,7 @@ BOOLEAN PhParseKsiSettingsBlob( // copied from ksisup.c (dmex)
     return FALSE;
 }
 
+_Function_class_(PH_COMMAND_LINE_CALLBACK)
 BOOLEAN NTAPI MainPropSheetCommandLineCallback(
     _In_opt_ PCPH_COMMAND_LINE_OPTION Option,
     _In_opt_ PPH_STRING Value,
@@ -422,19 +423,6 @@ BOOLEAN NTAPI MainPropSheetCommandLineCallback(
                     PhMoveReference(&context->SetupInstallPath, SetupFindInstallDirectory());
                     context->SetupIsLegacyUpdate = TRUE;
                 }
-            }
-        }
-    }
-    else
-    {
-        // Note: PhParseCommandLine requires "-" for commandline parameters
-        // and we already support the -silent parameter however we need to maintain
-        // compatibility with the legacy Inno Setup. (dmex)
-        if (!PhIsNullOrEmptyString(Value))
-        {
-            if (PhEqualString2(Value, L"/silent", TRUE))
-            {
-                context->Silent = TRUE;
             }
         }
     }

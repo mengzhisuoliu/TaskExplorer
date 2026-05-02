@@ -437,13 +437,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/DriverWindow.cpp" line="112"/>
+        <location filename="GUI/DriverWindow.cpp" line="138"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/DriverWindow.cpp" line="114"/>
-        <location filename="GUI/DriverWindow.cpp" line="116"/>
+        <location filename="GUI/DriverWindow.cpp" line="140"/>
+        <location filename="GUI/DriverWindow.cpp" line="142"/>
         <source>N/A</source>
         <translation type="unfinished"></translation>
     </message>
@@ -561,6 +561,27 @@
     <message>
         <location filename="GUI/SystemInfo/GPUView.cpp" line="228"/>
         <source>Node Usage</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CGetFileJob</name>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="167"/>
+        <source>Failed to download file from: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>CGetUpdatesJob</name>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="112"/>
+        <source>Network Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="114"/>
+        <source>Code %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2202,6 +2223,146 @@ Modifiers:<byte value="xd"/>
     </message>
 </context>
 <context>
+    <name>COnlineUpdater</name>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="309"/>
+        <source>Do you want to check if there is a new version of TaskExplorer?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="310"/>
+        <source>Don&apos;t show this message again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="378"/>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="389"/>
+        <source>server not reachable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="392"/>
+        <source>Failed to check for updates, error: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="437"/>
+        <source>No new updates found, your TaskExplorer is up-to-date.
+
+Note: The update check is often behind the latest GitHub release to ensure that only tested updates are offered.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="577"/>
+        <source>&lt;p&gt;There is a new version of TaskExplorer available.&lt;br /&gt;&lt;font color=&apos;red&apos;&gt;&lt;b&gt;New version:&lt;/b&gt;&lt;/font&gt; &lt;b&gt;%1&lt;/b&gt;&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="591"/>
+        <source>&lt;p&gt;Do you want to download the installer?&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="595"/>
+        <source>&lt;p&gt;Do you want to download the updates?&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="599"/>
+        <source>&lt;p&gt;Do you want to go to the &lt;a href=&quot;%1&quot;&gt;download page&lt;/a&gt;?&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="608"/>
+        <source>Don&apos;t show this update anymore.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="652"/>
+        <source>Downloading installer...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="721"/>
+        <source>&lt;p&gt;A new TaskExplorer installer has been downloaded to the following location:&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;%2&quot;&gt;%1&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Do you want to begin the installation? If any programs are running in secure enclaves, they will be terminated!&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="784"/>
+        <source>&lt;p&gt;Do you want to go to the &lt;a href=&quot;%1&quot;&gt;info page&lt;/a&gt;?&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="804"/>
+        <source>Don&apos;t show this announcement in the future.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="852"/>
+        <source>Downloading updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="873"/>
+        <source>Failed to download updates from server, error %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="894"/>
+        <source>invalid parameter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="895"/>
+        <source>failed to download updated information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="896"/>
+        <source>failed to load updated json file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="897"/>
+        <source>failed to download a particular file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="898"/>
+        <source>failed to scan existing installation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="899"/>
+        <source>updated signature is invalid !!!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="900"/>
+        <source>downloaded file is corrupted</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="901"/>
+        <source>internal error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="902"/>
+        <source>unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/OnlineUpdater.cpp" line="945"/>
+        <source>&lt;p&gt;Updates for TaskExplorer have been downloaded.&lt;/p&gt;&lt;p&gt;Do you want to apply these updates? If any programs are running in secure enclaves, they will be terminated.&lt;/p&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CPersistenceConfig</name>
     <message>
         <location filename="GUI/PersistenceConfig.cpp" line="105"/>
@@ -3552,7 +3713,7 @@ Modifiers:<byte value="xd"/>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/ProcessTree.cpp" line="884"/>
+        <location filename="GUI/ProcessTree.cpp" line="886"/>
         <source>Failed to set Process execution required</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4618,108 +4779,161 @@ To change the limit adjust the option &apos;Options/ResultLimit&apos;.</source>
 <context>
     <name>CSettingsWindow</name>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="34"/>
+        <location filename="GUI/SettingsWindow.cpp" line="36"/>
         <source>Task Explorer - Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="90"/>
+        <location filename="GUI/SettingsWindow.cpp" line="93"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="91"/>
+        <location filename="GUI/SettingsWindow.cpp" line="94"/>
         <source>Native</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="92"/>
+        <location filename="GUI/SettingsWindow.cpp" line="95"/>
         <source>Qt</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="97"/>
+        <location filename="GUI/SettingsWindow.cpp" line="100"/>
         <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="103"/>
+        <location filename="GUI/SettingsWindow.cpp" line="106"/>
         <source>Select font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="105"/>
+        <location filename="GUI/SettingsWindow.cpp" line="108"/>
         <source>Reset font</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="132"/>
+        <location filename="GUI/SettingsWindow.cpp" line="115"/>
+        <source>Every Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="116"/>
+        <source>Every Week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="117"/>
+        <source>Every 2 Weeks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="118"/>
+        <source>Every 30 days</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="120"/>
+        <source>Ignore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="121"/>
+        <location filename="GUI/SettingsWindow.cpp" line="125"/>
+        <source>Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="122"/>
+        <location filename="GUI/SettingsWindow.cpp" line="126"/>
+        <source>Download &amp; Notify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="123"/>
+        <location filename="GUI/SettingsWindow.cpp" line="127"/>
+        <source>Download &amp; Install</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="176"/>
         <source>Close to Tray</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="133"/>
+        <location filename="GUI/SettingsWindow.cpp" line="177"/>
         <source>Prompt before Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="134"/>
+        <location filename="GUI/SettingsWindow.cpp" line="178"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="140"/>
+        <location filename="GUI/SettingsWindow.cpp" line="184"/>
         <source>Show static Icon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="141"/>
+        <location filename="GUI/SettingsWindow.cpp" line="185"/>
         <source>CPU plot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="142"/>
+        <location filename="GUI/SettingsWindow.cpp" line="186"/>
         <source>CPU plot and Memory bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="143"/>
+        <location filename="GUI/SettingsWindow.cpp" line="187"/>
         <source>CPU plot and RAM bar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="144"/>
+        <location filename="GUI/SettingsWindow.cpp" line="188"/>
         <source>CPU plot and RAM+Swap bars</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="154"/>
+        <location filename="GUI/SettingsWindow.cpp" line="198"/>
         <source>Description (Binary name)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="155"/>
+        <location filename="GUI/SettingsWindow.cpp" line="199"/>
         <source>Binary name (Description)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="156"/>
+        <location filename="GUI/SettingsWindow.cpp" line="200"/>
         <source>Binary name only</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="74"/>
+        <location filename="GUI/SettingsWindow.cpp" line="458"/>
+        <source>&lt;a href=&quot;check&quot;&gt;Check Now&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="486"/>
+        <source>%1 (Current)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/SettingsWindow.cpp" line="77"/>
         <source>Linux CPU Usage shows 100% per core, i.e. if a process is using 2 cores to 100% it will show as 200% total cpu usage.<byte value="xd"/>
 PartiallyChecked state means apply only to thread std::list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="52"/>
+        <location filename="GUI/SettingsWindow.cpp" line="55"/>
         <source>Auto Detection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/SettingsWindow.cpp" line="53"/>
+        <location filename="GUI/SettingsWindow.cpp" line="56"/>
         <source>No Translation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5460,939 +5674,954 @@ PartiallyChecked state means apply only to thread std::list.</source>
 <context>
     <name>CTaskExplorer</name>
     <message>
-        <location filename="main.cpp" line="369"/>
+        <location filename="main.cpp" line="256"/>
+        <source>The current DynData for the KTaskExplorer driver does not yet supported on your windows kernel version.&lt;br /&gt;You can check for &lt;a href=&quot;https://github.com/DavidXanatos/TaskExplorer/releases&quot;&gt;TaskExplorer updates on github&lt;/a&gt;, or grab the latest ksidyn.bin and ksidyn.sig from &lt;a href=&quot;https://systeminformer.sourceforge.io/downloads&quot;&gt;the latest SystemInformer&lt;/a&gt; and put them in the instalaltion directors next to KTaskExplorer.sys.&lt;br /&gt;Instalation Directory: %4&lt;br /&gt;&lt;br /&gt;Operating System Details:&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Windows %1&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Windows Kernel %2&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;TaskExplorer %3&lt;br /&gt;&lt;br /&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="269"/>
+        <source>Update did not resolve the issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="271"/>
+        <source>Do you want to try to download updated DynData Yes, start without the driver No?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="276"/>
+        <source>Failed to load KTaskExplorer driver, %1, Error: 0x%2 (%3).</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="main.cpp" line="364"/>
         <source>You are attempting to run the 32-bit version of Task Explorer on 64-bit Windows. Most features will not work correctly.
 
 Please run the 64-bit version of Task Explorer instead.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="111"/>
+        <location filename="GUI/TaskExplorer.cpp" line="121"/>
         <source>TaskExplorer v%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="214"/>
+        <location filename="GUI/TaskExplorer.cpp" line="226"/>
         <source>Run...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="216"/>
+        <location filename="GUI/TaskExplorer.cpp" line="228"/>
         <source>Run as...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="219"/>
+        <location filename="GUI/TaskExplorer.cpp" line="231"/>
         <source>Run as TrustedInstaller...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="228"/>
+        <location filename="GUI/TaskExplorer.cpp" line="240"/>
         <source>Restart Elevated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="230"/>
+        <location filename="GUI/TaskExplorer.cpp" line="242"/>
         <source>Exit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="249"/>
+        <location filename="GUI/TaskExplorer.cpp" line="261"/>
         <source>&amp;View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="250"/>
+        <location filename="GUI/TaskExplorer.cpp" line="262"/>
         <source>System Tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="133"/>
+        <location filename="GUI/TaskExplorer.cpp" line="143"/>
         <source> (Administrator)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="127"/>
+        <location filename="GUI/TaskExplorer.cpp" line="137"/>
         <source> - [%1KSI%2]</source>
         <oldsource> - [KSI Level %1]</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="135"/>
+        <location filename="GUI/TaskExplorer.cpp" line="145"/>
         <source> (root)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="213"/>
+        <location filename="GUI/TaskExplorer.cpp" line="225"/>
         <source>&amp;Tasks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="223"/>
+        <location filename="GUI/TaskExplorer.cpp" line="235"/>
         <source>Computer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="224"/>
+        <location filename="GUI/TaskExplorer.cpp" line="236"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="233"/>
+        <location filename="GUI/TaskExplorer.cpp" line="245"/>
         <source>Lock</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="234"/>
+        <location filename="GUI/TaskExplorer.cpp" line="246"/>
         <source>Logout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="236"/>
+        <location filename="GUI/TaskExplorer.cpp" line="248"/>
         <source>Standby</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="237"/>
+        <location filename="GUI/TaskExplorer.cpp" line="249"/>
         <source>Hibernate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="239"/>
+        <location filename="GUI/TaskExplorer.cpp" line="251"/>
         <source>Restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="240"/>
+        <location filename="GUI/TaskExplorer.cpp" line="252"/>
         <source>Force Restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="241"/>
+        <location filename="GUI/TaskExplorer.cpp" line="253"/>
         <source>Restart to Boot Menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="243"/>
+        <location filename="GUI/TaskExplorer.cpp" line="255"/>
         <source>Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="244"/>
+        <location filename="GUI/TaskExplorer.cpp" line="256"/>
         <source>Force Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="245"/>
+        <location filename="GUI/TaskExplorer.cpp" line="257"/>
         <source>Hybrid Shutdown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="267"/>
+        <location filename="GUI/TaskExplorer.cpp" line="279"/>
         <source>Task Tabs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="277"/>
+        <location filename="GUI/TaskExplorer.cpp" line="289"/>
         <source>System Info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="280"/>
+        <location filename="GUI/TaskExplorer.cpp" line="292"/>
         <source>Pause Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="282"/>
+        <location filename="GUI/TaskExplorer.cpp" line="294"/>
         <source>Refresh Now</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="283"/>
+        <location filename="GUI/TaskExplorer.cpp" line="295"/>
         <source>Reset all Panels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="285"/>
+        <location filename="GUI/TaskExplorer.cpp" line="297"/>
         <source>Tree/List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="288"/>
+        <location filename="GUI/TaskExplorer.cpp" line="300"/>
         <source>Expand Process Tree</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="291"/>
-        <location filename="GUI/TaskExplorer.cpp" line="458"/>
+        <location filename="GUI/TaskExplorer.cpp" line="303"/>
+        <location filename="GUI/TaskExplorer.cpp" line="473"/>
         <source>Filter Processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="293"/>
+        <location filename="GUI/TaskExplorer.cpp" line="305"/>
         <source>Select Filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="294"/>
+        <location filename="GUI/TaskExplorer.cpp" line="306"/>
         <source>Windows Processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="296"/>
+        <location filename="GUI/TaskExplorer.cpp" line="308"/>
         <source>System Processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="298"/>
+        <location filename="GUI/TaskExplorer.cpp" line="310"/>
         <source>Service Processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="300"/>
+        <location filename="GUI/TaskExplorer.cpp" line="312"/>
         <source>Processes of Other Logged-In Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="307"/>
+        <location filename="GUI/TaskExplorer.cpp" line="319"/>
         <source>&amp;Find</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="308"/>
+        <location filename="GUI/TaskExplorer.cpp" line="320"/>
         <source>Find Hidden Processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="310"/>
+        <location filename="GUI/TaskExplorer.cpp" line="322"/>
         <source>Find Handles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="312"/>
+        <location filename="GUI/TaskExplorer.cpp" line="324"/>
         <source>Find Module (dll)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="313"/>
+        <location filename="GUI/TaskExplorer.cpp" line="325"/>
         <source>Find String in Memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="315"/>
+        <location filename="GUI/TaskExplorer.cpp" line="327"/>
         <source>&amp;Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="316"/>
+        <location filename="GUI/TaskExplorer.cpp" line="328"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="326"/>
+        <location filename="GUI/TaskExplorer.cpp" line="339"/>
         <source>Auto Run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="329"/>
+        <location filename="GUI/TaskExplorer.cpp" line="342"/>
         <source>Skip UAC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="335"/>
+        <location filename="GUI/TaskExplorer.cpp" line="348"/>
         <source>&amp;Tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="336"/>
+        <location filename="GUI/TaskExplorer.cpp" line="349"/>
         <source>&amp;Services</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="337"/>
+        <location filename="GUI/TaskExplorer.cpp" line="350"/>
         <source>Create new Service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="339"/>
+        <location filename="GUI/TaskExplorer.cpp" line="352"/>
         <source>ReLoad all Service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="341"/>
+        <location filename="GUI/TaskExplorer.cpp" line="354"/>
         <source>Service Control Manager Permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="343"/>
+        <location filename="GUI/TaskExplorer.cpp" line="356"/>
         <source>&amp;Free Memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="344"/>
+        <location filename="GUI/TaskExplorer.cpp" line="357"/>
         <source>Empty Working set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="345"/>
+        <location filename="GUI/TaskExplorer.cpp" line="358"/>
         <source>Empty Modified pages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1616"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1639"/>
         <source>Found %1 hidden processes and added them to the process std::list.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="349"/>
+        <location filename="GUI/TaskExplorer.cpp" line="362"/>
         <source>Combine Pages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="120"/>
+        <location filename="GUI/TaskExplorer.cpp" line="130"/>
         <source>---</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="121"/>
+        <location filename="GUI/TaskExplorer.cpp" line="131"/>
         <source>--</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="122"/>
+        <location filename="GUI/TaskExplorer.cpp" line="132"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="123"/>
+        <location filename="GUI/TaskExplorer.cpp" line="133"/>
         <source>~</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="124"/>
+        <location filename="GUI/TaskExplorer.cpp" line="134"/>
         <source>+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="125"/>
+        <location filename="GUI/TaskExplorer.cpp" line="135"/>
         <source>++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="127"/>
+        <location filename="GUI/TaskExplorer.cpp" line="137"/>
         <source>Limited </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="226"/>
+        <location filename="GUI/TaskExplorer.cpp" line="238"/>
         <source>Window Finder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="318"/>
+        <location filename="GUI/TaskExplorer.cpp" line="330"/>
         <source>Driver Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="352"/>
+        <location filename="GUI/TaskExplorer.cpp" line="365"/>
         <source>Persistence Options</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="355"/>
+        <location filename="GUI/TaskExplorer.cpp" line="368"/>
         <source>Flush Dns Cache</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="357"/>
+        <location filename="GUI/TaskExplorer.cpp" line="370"/>
         <source>Security Explorer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="363"/>
+        <location filename="GUI/TaskExplorer.cpp" line="376"/>
         <source>Use Driver to Monitor System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="366"/>
+        <location filename="GUI/TaskExplorer.cpp" line="379"/>
         <source>Monitor ETW Events</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="371"/>
+        <location filename="GUI/TaskExplorer.cpp" line="384"/>
         <source>Monitor Windows Firewall</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="377"/>
-        <location filename="GUI/TaskExplorer.cpp" line="475"/>
+        <location filename="GUI/TaskExplorer.cpp" line="390"/>
+        <location filename="GUI/TaskExplorer.cpp" line="490"/>
         <source>Monitor Debug Output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="393"/>
+        <location filename="GUI/TaskExplorer.cpp" line="406"/>
         <source>&amp;Help</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="394"/>
+        <location filename="GUI/TaskExplorer.cpp" line="407"/>
         <source>Support TaskExplorer on Patreon</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="397"/>
+        <location filename="GUI/TaskExplorer.cpp" line="408"/>
+        <source>Visit Support Forum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/TaskExplorer.cpp" line="410"/>
+        <source>Check for Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/TaskExplorer.cpp" line="413"/>
         <source>About ProcessHacker Library</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="399"/>
+        <location filename="GUI/TaskExplorer.cpp" line="415"/>
         <source>About the Qt Framework</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="401"/>
-        <location filename="GUI/TaskExplorer.cpp" line="2012"/>
+        <location filename="GUI/TaskExplorer.cpp" line="416"/>
+        <location filename="GUI/TaskExplorer.cpp" line="2066"/>
         <source>About TaskExplorer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="414"/>
+        <location filename="GUI/TaskExplorer.cpp" line="429"/>
         <source>Refresh Now/Reset Hold</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="419"/>
+        <location filename="GUI/TaskExplorer.cpp" line="434"/>
         <source>Extremly fast (30Hz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="420"/>
+        <location filename="GUI/TaskExplorer.cpp" line="435"/>
         <source>Ultra fast (0.1s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="421"/>
+        <location filename="GUI/TaskExplorer.cpp" line="436"/>
         <source>Very fast (0.25s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="422"/>
+        <location filename="GUI/TaskExplorer.cpp" line="437"/>
         <source>Fast (0.5s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="423"/>
+        <location filename="GUI/TaskExplorer.cpp" line="438"/>
         <source>Normal (1s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="424"/>
+        <location filename="GUI/TaskExplorer.cpp" line="439"/>
         <source>Slow (2s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="425"/>
+        <location filename="GUI/TaskExplorer.cpp" line="440"/>
         <source>Very slow (5s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="426"/>
+        <location filename="GUI/TaskExplorer.cpp" line="441"/>
         <source>Extremely slow (10s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="436"/>
+        <location filename="GUI/TaskExplorer.cpp" line="451"/>
         <source>Hold ALL removed items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="441"/>
+        <location filename="GUI/TaskExplorer.cpp" line="456"/>
         <source>Short persistence (2.5s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="442"/>
+        <location filename="GUI/TaskExplorer.cpp" line="457"/>
         <source>Normal persistence (5s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="443"/>
+        <location filename="GUI/TaskExplorer.cpp" line="458"/>
         <source>Long persistence (10s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="444"/>
+        <location filename="GUI/TaskExplorer.cpp" line="459"/>
         <source>Very long persistence (60s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="445"/>
+        <location filename="GUI/TaskExplorer.cpp" line="460"/>
         <source>Extremely long persistence (5m)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="446"/>
+        <location filename="GUI/TaskExplorer.cpp" line="461"/>
         <source>Pseudo static persistence (1h)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="493"/>
+        <location filename="GUI/TaskExplorer.cpp" line="508"/>
         <source>Search...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="617"/>
+        <location filename="GUI/TaskExplorer.cpp" line="632"/>
         <source>TaskExplorer is ready...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="724"/>
+        <location filename="GUI/TaskExplorer.cpp" line="744"/>
         <source>Do you want to close TaskExplorer?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="941"/>
+        <location filename="GUI/TaskExplorer.cpp" line="964"/>
         <source>CPU: %1%    </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="951"/>
+        <location filename="GUI/TaskExplorer.cpp" line="974"/>
         <source>GPU-%1: %2%    </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="968"/>
+        <location filename="GUI/TaskExplorer.cpp" line="991"/>
         <source>Memory: %1/%2/(%3 + %4)    </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="970"/>
+        <location filename="GUI/TaskExplorer.cpp" line="993"/>
         <source>Memory: %1/%2/%3    </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="973"/>
+        <location filename="GUI/TaskExplorer.cpp" line="996"/>
         <source>Installed: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="974"/>
+        <location filename="GUI/TaskExplorer.cpp" line="997"/>
         <source>Swap: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="975"/>
+        <location filename="GUI/TaskExplorer.cpp" line="998"/>
         <source>Commited: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="976"/>
+        <location filename="GUI/TaskExplorer.cpp" line="999"/>
         <source>Physical: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="983"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1006"/>
         <source>R: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="985"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1008"/>
         <source>W: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="989"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1012"/>
         <source>FileIO; Read: %1; Write: %2; Other: %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="990"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1013"/>
         <source>MMapIO; Read: %1; Write: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="993"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1016"/>
         <source>DiskIO; Read: %1; Write: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1009"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1032"/>
         <source>TCP/IP; Download: %1; Upload: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1010"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1033"/>
         <source>VPN/RAS; Download: %1; Upload: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1209"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1232"/>
         <source>Do you really want to %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1267"/>
-        <location filename="GUI/TaskExplorer.cpp" line="1354"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1290"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1377"/>
         <source>Failed to %1, due to: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1278"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1301"/>
         <source>Users (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1292"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1315"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1293"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1316"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1294"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1317"/>
         <source>Logoff</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1302"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1325"/>
         <source>%1: %2 (%3)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1329"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1352"/>
         <source>Connect to session, enter Password:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1604"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1627"/>
         <source>Memory opertion failed; Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1618"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1641"/>
         <source>No hidden processes found.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1831"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1854"/>
         <source>Graph background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1832"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1855"/>
         <source>Graph text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1834"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1857"/>
         <source>Plot background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1835"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1858"/>
         <source>Plot text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1836"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1859"/>
         <source>Plot grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1838"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1861"/>
         <source>List grid color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1839"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1862"/>
         <source>Default background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1842"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1865"/>
         <source>New items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1843"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1866"/>
         <source>Removed items</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1846"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1869"/>
         <source>Dangerous process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1848"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1871"/>
         <source>System processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1849"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1872"/>
         <source>Current user processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1850"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1873"/>
         <source>Service processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1852"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1875"/>
         <source>Sandboxed processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1853"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1876"/>
         <source>Job processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1854"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1877"/>
         <source>Pico processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1855"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1878"/>
         <source>Immersive processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1856"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1879"/>
         <source>.NET processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1858"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1881"/>
         <source>Elevated processes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1860"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1883"/>
         <source>Kernel Services (Driver)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1861"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1884"/>
         <source>Gui threads</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1862"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1885"/>
         <source>Inherited handles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1863"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1886"/>
         <source>Protected handles/Critical tasks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1866"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1889"/>
         <source>Executable memory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1003"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1997"/>
+        <source>&lt;a href=&quot;#update&quot;&gt;Update to TaskExplorer %1 available!&lt;/a&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="GUI/TaskExplorer.cpp" line="1026"/>
         <source>D: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="302"/>
+        <location filename="GUI/TaskExplorer.cpp" line="314"/>
         <source>Processes of the Current User</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="346"/>
+        <location filename="GUI/TaskExplorer.cpp" line="359"/>
         <source>Empty Standby std::list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="347"/>
+        <location filename="GUI/TaskExplorer.cpp" line="360"/>
         <source>Empty Priority 0 std::list</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="598"/>
+        <location filename="GUI/TaskExplorer.cpp" line="613"/>
         <source>TaskExplorer with kernel driver is ready...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1005"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1028"/>
         <source>U: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1136"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1159"/>
         <source>Operation failed for %1 item(s).</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1018"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1041"/>
         <source>Task Explorer<byte value="xd"/>
 CPU: %1%<byte value="xd"/>
 Ram: %2%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1021"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1044"/>
         <source><byte value="xd"/>
 Swap: %1%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.cpp" line="283"/>
+        <location filename="main.cpp" line="281"/>
         <source>Disable KTaskExplorer driver. Note: this will limit the aplications functionality!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="939"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1197"/>
         <source>Updating DynData</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1996"/>
+        <location filename="GUI/TaskExplorer.cpp" line="2050"/>
         <source>&lt;p&gt;TaskExplorer is a powerfull multi-purpose Task Manager that helps you monitor system resources, debug software and detect malware.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;On Windows TaskExplorer is powered by the ProsessHacker Library.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Visit &lt;a href=&quot;https://github.com/DavidXanatos/TaskExplorer&quot;&gt;TaskExplorer on github&lt;/a&gt; for more information.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Config Dir: %1&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;Icons from &lt;a href=&quot;https://icons8.com&quot;&gt;icons8.com&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="main.cpp" line="249"/>
-        <source>Failed to update DynData, %1, Error: 0x%2 (%3).
-Do you want to continue anyways (Ok), or terminate (Cancel)?</source>
+        <source>Failed to update DynData, %1, Error: 0x%2 (%3).</source>
+        <oldsource>Failed to update DynData, %1, Error: 0x%2 (%3).
+Do you want to continue anyways (Ok), or terminate (Cancel)?</oldsource>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.cpp" line="257"/>
-        <source>The current DynData for the KTaskExplorer driver does not yet supported on your windows kernel version.&lt;br /&gt;You can check for &lt;a href=&quot;https://github.com/DavidXanatos/TaskExplorer/releases&quot;&gt;TaskExplorer updates on github&lt;/a&gt;, or grab the latest ksidyn.bin and ksidyn.sig from &lt;a href=&quot;https://systeminformer.sourceforge.io/downloads&quot;&gt;the latest SystemInformer&lt;/a&gt; and put them in the instalaltion directors next to KSystemInformer.sys.&lt;br /&gt;Instalation Directory: %4&lt;br /&gt;&lt;br /&gt;Operating System Details:&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Windows %1&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Windows Kernel %2&lt;br /&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;TaskExplorer %3&lt;br /&gt;&lt;br /&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main.cpp" line="270"/>
-        <source>Update did not help, do you want to continue anyways (Ok), or terminate (Cancel)?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main.cpp" line="272"/>
-        <source>Do you want to try to download updated DynData (Yes), start without the driver (No), or terminate (Cancel)?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="main.cpp" line="277"/>
-        <source>Failed to load KTaskExplorer driver, %1, Error: 0x%2 (%3).
-Do you want to continue anyways (Ok), or terminate (Cancel)?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="956"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1214"/>
         <source>Failed to open archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="968"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1226"/>
         <source>DynData not found in archive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="991"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1246"/>
         <source>Failed to extreact files.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1001"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1267"/>
         <source>Updated DynData successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1029"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1295"/>
         <source>Downloading latest SI build</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1036"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1302"/>
         <source>Download Failed, Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1042"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1308"/>
         <source>Failed to open file for writing.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1048"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1314"/>
         <source>Successfully Downloaded latest SI build</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1069"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1335"/>
         <source>Update Check Failed, Error: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="1078"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="1344"/>
         <source>Update Check Failed, Error: Unrecognized Reply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1991"/>
+        <location filename="GUI/TaskExplorer.cpp" line="2045"/>
         <source>&lt;h3&gt;About TaskExplorer&lt;/h3&gt;&lt;p&gt;Version %1&lt;/p&gt;&lt;p&gt;Copyright (C) 2019-2025 David Xanatos (xanasoft.com)&lt;/p&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1924"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1947"/>
         <source>Reset Columns</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1925"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1948"/>
         <source>Copy Cell</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1926"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1949"/>
         <source>Copy Row</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1927"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1950"/>
         <source>Copy Panel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1928"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1951"/>
         <source>Case Sensitive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1929"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1952"/>
         <source>RegExp</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1930"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1953"/>
         <source>Highlight</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1931"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1954"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1932"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1955"/>
         <source>&amp;Find ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="GUI/TaskExplorer.cpp" line="1933"/>
+        <location filename="GUI/TaskExplorer.cpp" line="1956"/>
         <source>All columns</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="main.cpp" line="290"/>
+        <location filename="main.cpp" line="288"/>
         <source>Failed to update DynData, %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8771,577 +9000,577 @@ A 64-bit dump will be created instead.</source>
 <context>
     <name>CWinProcess</name>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="252"/>
+        <location filename="API/Windows/WinProcess.cpp" line="254"/>
         <source>Unknown process PID: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="291"/>
+        <location filename="API/Windows/WinProcess.cpp" line="293"/>
         <source>System Idle Process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2051"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2053"/>
         <source>Native</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2052"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2054"/>
         <source>Windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2053"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2055"/>
         <source>Windows console</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2054"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2056"/>
         <source>OS/2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2055"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2057"/>
         <source>POSIX</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2056"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2058"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2177"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2179"/>
         <source>Not responding</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2177"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2179"/>
         <source>Running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2193"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2195"/>
         <source>10</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2194"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2196"/>
         <source>8.1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2195"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2197"/>
         <source>8</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2196"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2198"/>
         <source>7</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2197"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2199"/>
         <source>Vista</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2198"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2200"/>
         <source>XP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2210"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2212"/>
         <source>ASLR</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2219"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2221"/>
         <source>DEP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2223"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2225"/>
         <source>CFG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2226"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2228"/>
         <source>XFG Audit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2228"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2230"/>
         <source>XFG</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2231"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2233"/>
         <source>CET strict</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2233"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2235"/>
         <source>CET</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2336"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2338"/>
         <source>Editing environment variable(s) of suspended processes is not supported.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2364"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2366"/>
         <source>Unable to set the environment variable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2368"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2370"/>
         <source>Unable to delete the environment variable.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2378"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2380"/>
         <source>Hidden (!)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2380"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2382"/>
         <source>Terminated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2385"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3012"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2387"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3014"/>
         <source>Critical</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2387"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2389"/>
         <source>Sandboxed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2389"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2391"/>
         <source>Debugged</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2391"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2393"/>
         <source>Suspended</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2393"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2395"/>
         <source>Handle Filtered</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2396"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2398"/>
         <source>Elevated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2398"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2400"/>
         <source>Pico</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2400"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2402"/>
         <source>Cross Session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2402"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2404"/>
         <source>Frozen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2404"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2406"/>
         <source>Background</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2406"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2408"/>
         <source>Packaged (UWP)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2408"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2410"/>
         <source>Secure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2410"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2412"/>
         <source>Immersive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2412"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2414"/>
         <source>DotNet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2414"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2416"/>
         <source>Packed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2416"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2418"/>
         <source>Wow64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2418"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2420"/>
         <source>InSignificantJob</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2420"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2422"/>
         <source>Reflected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2422"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2424"/>
         <source>System Process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2424"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2426"/>
         <source>Secure System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2431"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2433"/>
         <source>Job</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2433"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2435"/>
         <source>Service</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2435"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2437"/>
         <source>System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2437"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2439"/>
         <source>Owned</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2439"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2441"/>
         <source>, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2489"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2491"/>
         <source>Unable to locate the debugger.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2505"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2507"/>
         <source>Failed to create debugger process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2537"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2539"/>
         <source>The process is not being debugged.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2542"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2544"/>
         <source>Failed to detach debugger</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2694"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2696"/>
         <source>Unaware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2695"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2697"/>
         <source>System aware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2696"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2698"/>
         <source>Per-monitor aware</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2723"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2725"/>
         <source>Light %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2724"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2726"/>
         <source>Full %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2725"/>
-        <location filename="API/Windows/WinProcess.cpp" line="2985"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3004"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3017"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2727"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2987"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3006"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3019"/>
         <source>Unknown %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2730"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2732"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2749"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2751"/>
         <source>KPH %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2863"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2865"/>
         <source>Loader Integrity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2863"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2865"/>
         <source>OS signing levels for dependent module loads are enabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2868"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2870"/>
         <source>Module Tampering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2868"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2870"/>
         <source>Module Tampering protection is enabled.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2873"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2875"/>
         <source>Indirect branch prediction</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2873"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2875"/>
         <source>Protects against sibling hardware threads (hyperthreads) from interfering with indirect branch predictions.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2878"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2880"/>
         <source>Dynamic code (downgrade)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2878"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2880"/>
         <source>Allows a broker to downgrade the dynamic code policy for a process.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2883"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2885"/>
         <source>Speculative store bypass</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2883"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2885"/>
         <source>Disables spectre mitigations for the process.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2979"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2981"/>
         <source>Real time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2980"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3013"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2982"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3015"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2981"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2983"/>
         <source>Above normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2982"/>
-        <location filename="API/Windows/WinProcess.cpp" line="2998"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3014"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2984"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3000"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3016"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2983"/>
-        <location filename="API/Windows/WinProcess.cpp" line="2999"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2985"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3001"/>
         <source>Below normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="2984"/>
+        <location filename="API/Windows/WinProcess.cpp" line="2986"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3000"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3002"/>
         <source>Medium</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3001"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3015"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3003"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3017"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3002"/>
-        <location filename="API/Windows/WinProcess.cpp" line="3016"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3004"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3018"/>
         <source>Very low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3003"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3005"/>
         <source>Lowest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3042"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3044"/>
         <source>Failed to set Process priority boost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3097"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3099"/>
         <source>Failed to set Process efficiency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3137"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3139"/>
         <source>Failed to set Process priority</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3177"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3179"/>
         <source>Failed to set Page priority</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3217"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3219"/>
         <source>Failed to set I/O priority</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3249"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3251"/>
         <source>64 (100%%) | %1 (%2%%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3253"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3255"/>
         <source>%1 (%2%%) | 0 (0%%)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3270"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3272"/>
         <source>Fail critical</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3272"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3274"/>
         <source>GP faults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3274"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3276"/>
         <source>Alignment faults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3276"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3278"/>
         <source>Openfile faults</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3296"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3298"/>
         <source>0x%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3325"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3327"/>
         <source>Failed to set CPU affinity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3348"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3350"/>
         <source>You are about to terminate one or more critical processes. This will shut down the operating system immediately.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3368"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3370"/>
         <source>Failed to terminate process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3399"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3401"/>
         <source>Failed to suspend process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3424"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3426"/>
         <source>Failed to resume process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3438"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3440"/>
         <source>Process already frozen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3443"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3445"/>
         <source>Failed to freeze process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3453"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3455"/>
         <source>Process is not frozen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3457"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3459"/>
         <source>Failed to un-freeze process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3504"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3506"/>
         <source>If the process ends, the operating system will shut down immediately.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3516"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3518"/>
         <source>Unable to change the process critical status.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3544"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3546"/>
         <source>Unable to reduce the working set of a process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3667"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3670"/>
         <source>load the DLL into</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="3873"/>
+        <location filename="API/Windows/WinProcess.cpp" line="3876"/>
         <source>Failed Flush Heaps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="4021"/>
+        <location filename="API/Windows/WinProcess.cpp" line="4024"/>
         <source>Unknown action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinProcess.cpp" line="4022"/>
+        <location filename="API/Windows/WinProcess.cpp" line="4025"/>
         <source>Unknown path</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10188,7 +10417,7 @@ If you save the recovery information using this program, the additional failure 
     </message>
     <message>
         <location filename="API/Windows/WinToken.cpp" line="499"/>
-        <location filename="API/Windows/WinToken.cpp" line="1010"/>
+        <location filename="API/Windows/WinToken.cpp" line="1011"/>
         <source>N/A</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10274,142 +10503,142 @@ If you save the recovery information using this program, the additional failure 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="983"/>
+        <location filename="API/Windows/WinToken.cpp" line="984"/>
         <source>Primary</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="986"/>
-        <location filename="API/Windows/WinToken.cpp" line="1001"/>
+        <location filename="API/Windows/WinToken.cpp" line="987"/>
+        <location filename="API/Windows/WinToken.cpp" line="1002"/>
         <source>Impersonation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="995"/>
+        <location filename="API/Windows/WinToken.cpp" line="996"/>
         <source>Anonymous</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="998"/>
+        <location filename="API/Windows/WinToken.cpp" line="999"/>
         <source>Identification</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1004"/>
+        <location filename="API/Windows/WinToken.cpp" line="1005"/>
         <source>Delegation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1098"/>
+        <location filename="API/Windows/WinToken.cpp" line="1099"/>
         <source>Child</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1099"/>
+        <location filename="API/Windows/WinToken.cpp" line="1100"/>
         <source>Parent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1100"/>
+        <location filename="API/Windows/WinToken.cpp" line="1101"/>
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1269"/>
-        <location filename="API/Windows/WinToken.cpp" line="1391"/>
+        <location filename="API/Windows/WinToken.cpp" line="1270"/>
+        <location filename="API/Windows/WinToken.cpp" line="1392"/>
         <source>Version %1: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1283"/>
-        <location filename="API/Windows/WinToken.cpp" line="1405"/>
+        <location filename="API/Windows/WinToken.cpp" line="1284"/>
+        <location filename="API/Windows/WinToken.cpp" line="1406"/>
         <source>(Invalid SID)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1289"/>
-        <location filename="API/Windows/WinToken.cpp" line="1347"/>
-        <location filename="API/Windows/WinToken.cpp" line="1411"/>
+        <location filename="API/Windows/WinToken.cpp" line="1290"/>
+        <location filename="API/Windows/WinToken.cpp" line="1348"/>
+        <location filename="API/Windows/WinToken.cpp" line="1412"/>
         <source>(Unknown)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1331"/>
+        <location filename="API/Windows/WinToken.cpp" line="1332"/>
         <source>Invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1333"/>
+        <location filename="API/Windows/WinToken.cpp" line="1334"/>
         <source>Int64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1335"/>
+        <location filename="API/Windows/WinToken.cpp" line="1336"/>
         <source>UInt64</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1337"/>
+        <location filename="API/Windows/WinToken.cpp" line="1338"/>
         <source>String</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1339"/>
+        <location filename="API/Windows/WinToken.cpp" line="1340"/>
         <source>FQBN</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1341"/>
+        <location filename="API/Windows/WinToken.cpp" line="1342"/>
         <source>SID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1343"/>
+        <location filename="API/Windows/WinToken.cpp" line="1344"/>
         <source>Boolean</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1345"/>
+        <location filename="API/Windows/WinToken.cpp" line="1346"/>
         <source>Octet string</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1358"/>
+        <location filename="API/Windows/WinToken.cpp" line="1359"/>
         <source>Mandatory, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1360"/>
+        <location filename="API/Windows/WinToken.cpp" line="1361"/>
         <source>Disabled, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1362"/>
+        <location filename="API/Windows/WinToken.cpp" line="1363"/>
         <source>Default disabled, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1364"/>
+        <location filename="API/Windows/WinToken.cpp" line="1365"/>
         <source>Use for deny only, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1366"/>
+        <location filename="API/Windows/WinToken.cpp" line="1367"/>
         <source>Case-sensitive, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1368"/>
+        <location filename="API/Windows/WinToken.cpp" line="1369"/>
         <source>Non-inheritable, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1370"/>
+        <location filename="API/Windows/WinToken.cpp" line="1371"/>
         <source>Compare-ignore, </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WinToken.cpp" line="1375"/>
+        <location filename="API/Windows/WinToken.cpp" line="1376"/>
         <source>(None)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10473,77 +10702,77 @@ If you save the recovery information using this program, the additional failure 
 <context>
     <name>CWindowsAPI</name>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="1576"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="1577"/>
         <source>Unknown file name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2257"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2258"/>
         <source>Windows %1.%2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2259"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2260"/>
         <source>Windows %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2261"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2262"/>
         <source>%1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2263"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2264"/>
         <source>%1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2300"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2301"/>
         <source>Active</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2301"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2302"/>
         <source>Connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2302"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2303"/>
         <source>Connect query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2303"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2304"/>
         <source>Shadow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2304"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2305"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2305"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2306"/>
         <source>Idle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2306"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2307"/>
         <source>Listen</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2307"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2308"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2308"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2309"/>
         <source>Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="API/Windows/WindowsAPI.cpp" line="2309"/>
+        <location filename="API/Windows/WindowsAPI.cpp" line="2310"/>
         <source>Init</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10895,7 +11124,7 @@ If you save the recovery information using this program, the additional failure 
 <context>
     <name>QObject</name>
     <message>
-        <location filename="API/Windows/ProcessHacker.cpp" line="680"/>
+        <location filename="API/Windows/ProcessHacker.cpp" line="896"/>
         <source>The kernel driver file &apos;%1&apos; was not found.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -11278,6 +11507,66 @@ If you save the recovery information using this program, the additional failure 
     <message>
         <location filename="Forms/SettingsWindow.ui" line="836"/>
         <source>Support Sandboxie</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="856"/>
+        <source>Online Updater</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="889"/>
+        <source>Update Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="916"/>
+        <source>Check periodically for new TaskExplorer versions</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="944"/>
+        <source>Update Check Interval</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="954"/>
+        <source>New full installers from the selected release channel.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="957"/>
+        <source>Full Upgrades</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="993"/>
+        <source>Hotpatches for the installed version, updates to the Templates.ini and translations.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="996"/>
+        <source>Incremental Updates</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="1019"/>
+        <source>The stable channel contains the latest stable GitHub releases.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="1022"/>
+        <source>Search in the Stable channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="1029"/>
+        <source>The preview channel contains the latest GitHub pre-releases.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="Forms/SettingsWindow.ui" line="1032"/>
+        <source>Search in the Preview channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

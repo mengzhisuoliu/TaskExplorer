@@ -65,7 +65,7 @@ static BOOLEAN g_ServiceMode = FALSE;
 
 // Forward declarations
 BOOLEAN InitializeProcessHacker(VOID);
-CVariant ProcessCommand(const CVariant& Request);
+CVariant ProcessCommand(const CVariant& Request, ULONG pid);
 BOOLEAN SendCVariant(HANDLE hPipe, const CVariant& variant);
 BOOLEAN RecvCVariant(HANDLE hPipe, CVariant& variant);
 ULONGLONG GetTickCount64Compat(VOID);
@@ -1313,7 +1313,7 @@ CVariant GetProcessHeapsCV(HANDLE ProcessId)
     return result;
 }
 
-CVariant ProcessCommand(const CVariant& Request)
+CVariant ProcessCommand(const CVariant& Request, ULONG pid)
 {
     CVariant Response;
 
@@ -1568,6 +1568,125 @@ CVariant ProcessCommand(const CVariant& Request)
         else
         {
             Response = CVariant((uint32)STATUS_INVALID_PARAMETER);
+        }
+    }
+    else if (Command == "CreateProcessForKsi")
+    {
+        if (Parameters.IsValid() && Parameters.GetType() == VAR_TYPE_MAP)
+        {
+            NTSTATUS status;
+            std::wstring commandLineStr = Parameters.Find("CommandLine").ToWString();
+            ULONGLONG mitigationFlags0 = Parameters.Find("MitigationFlags0").To<uint64>();
+            ULONGLONG mitigationFlags1 = Parameters.Find("MitigationFlags1").To<uint64>();
+
+            PPROC_THREAD_ATTRIBUTE_LIST attributeList = NULL;
+            STARTUPINFOEXW startupInfoEx;
+            HANDLE processHandle = NULL;
+            HANDLE tokenHandle = NULL;
+            PVOID environment = NULL;
+            PWSTR commandLineCopy = NULL;
+
+            // Set up mitigation flags if specified
+            if (mitigationFlags0 || mitigationFlags1)
+            {
+                ULONGLONG mitigationFlags[2] = { mitigationFlags0, mitigationFlags1 };
+
+                status = PhInitializeProcThreadAttributeList(&attributeList, 1);
+
+                if (!NT_SUCCESS(status))
+                    goto CreateProcessForKsiCleanup;
+
+                // Windows 10 22H2+ supports two ULONG64 values for mitigation policy
+                ULONG mitigationSize = sizeof(ULONG64);
+                if (mitigationFlags1)
+                    mitigationSize = sizeof(ULONG64) * 2;
+
+                status = PhUpdateProcThreadAttribute(
+                    attributeList,
+                    PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY,
+                    mitigationFlags,
+                    mitigationSize
+                );
+
+                if (!NT_SUCCESS(status))
+                    goto CreateProcessForKsiCleanup;
+            }
+
+            ZeroMemory(&startupInfoEx, sizeof(STARTUPINFOEXW));
+            startupInfoEx.StartupInfo.cb = sizeof(STARTUPINFOEXW);
+            startupInfoEx.lpAttributeList = attributeList;
+
+            // Open the client process (pid is the calling process)
+            status = PhOpenProcess(
+                &processHandle,
+                PROCESS_QUERY_LIMITED_INFORMATION,
+                UlongToHandle(pid)
+            );
+
+            if (!NT_SUCCESS(status))
+                goto CreateProcessForKsiCleanup;
+
+            // Get the client's token
+            status = PhOpenProcessToken(
+                processHandle,
+                TOKEN_ALL_ACCESS,
+                &tokenHandle
+            );
+
+            if (!NT_SUCCESS(status))
+                goto CreateProcessForKsiCleanup;
+
+            // Create environment block from the token
+            status = PhCreateEnvironmentBlock(&environment, tokenHandle, FALSE);
+
+            if (!NT_SUCCESS(status))
+                goto CreateProcessForKsiCleanup;
+
+            // Make a writable copy of command line (CreateProcessAsUser requires it)
+            if (!commandLineStr.empty())
+            {
+                size_t cmdLen = commandLineStr.length() + 1;
+                commandLineCopy = (PWSTR)PhAllocate(cmdLen * sizeof(WCHAR));
+                wcscpy_s(commandLineCopy, cmdLen, commandLineStr.c_str());
+            }
+
+            // Create the process with the client's token
+            status = PhCreateProcessWin32Ex(
+                NULL,
+                commandLineCopy,
+                environment,
+                NULL,
+                &startupInfoEx,
+                (PH_CREATE_PROCESS_DEFAULT_ERROR_MODE |
+                 PH_CREATE_PROCESS_EXTENDED_STARTUPINFO |
+                 PH_CREATE_PROCESS_UNICODE_ENVIRONMENT),
+                tokenHandle,
+                NULL,
+                NULL,
+                NULL
+            );
+
+        CreateProcessForKsiCleanup:
+            if (commandLineCopy)
+                PhFree(commandLineCopy);
+
+            if (environment)
+                PhDestroyEnvironmentBlock(environment);
+
+            if (tokenHandle)
+                NtClose(tokenHandle);
+
+            if (processHandle)
+                NtClose(processHandle);
+
+            if (attributeList)
+                PhDeleteProcThreadAttributeList(attributeList);
+
+            Response = CVariant((sint32)status);
+        }
+        else
+        {
+            Response = CVariant((sint32)STATUS_INVALID_PARAMETER);
         }
     }
     else if (Command == "CloseSocket")
@@ -1990,7 +2109,10 @@ VOID ServiceWorkerThread(PVOID Parameter)
 DWORD WINAPI ClientHandlerThread(LPVOID lpParam)
 {
     HANDLE hPipe = (HANDLE)lpParam;
+    ULONG pid = 0;
     g_PipeHandle = hPipe;
+    
+    GetNamedPipeClientProcessId(hPipe, &pid);
 
     // Process client requests
     while (TRUE)
@@ -2005,7 +2127,7 @@ DWORD WINAPI ClientHandlerThread(LPVOID lpParam)
         g_LastActivity = GetTickCount64Compat();
 
         // Process the command
-        CVariant response = ProcessCommand(request);
+        CVariant response = ProcessCommand(request, pid);
 
         // Send response CVariant
         if (!SendCVariant(hPipe, response))

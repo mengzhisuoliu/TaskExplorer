@@ -23,6 +23,7 @@ extern "C" {
 }
 #include <settings.h>
 #include <psapi.h>
+#include "../../SVC/TaskService.h"
 
 QString CastPhString(PPH_STRING phString, bool bDeRef)
 {
@@ -262,16 +263,23 @@ static VOID NTAPI KsiCommsCallback(
     _In_ PCKPH_MESSAGE Message
     )
 {
+	if (Message->Header.MessageId == KphMsgRequiredStateFailure &&
+		Message->Kernel.RequiredStateFailure.ClientId.UniqueProcess == NtCurrentProcessId())
+	{
+		// force the cached value to be updated
+		KphLevelEx(FALSE);
+	}
+
 	//static QMap<void*,int> killMap;
 	//static QMutex killMutex;
 	switch (Message->Header.MessageId)
 	{
 		case KphMsgProcessCreate:
 		{
-			PPH_FREE_LIST freelist = KphGetMessageFreeList();
+			PKPH_MESSAGE msg = KphCreateMessage(KPH_MESSAGE_MIN_SIZE);
 
-			PKPH_MESSAGE msg = (PKPH_MESSAGE)PhAllocateFromFreeList(freelist);
 			KphMsgInit(msg, KphMsgProcessCreate);
+
 			if (g_KernelProcessMonitor) 
 			{
 				quint64 ProcessId = (quint64)Message->Kernel.ProcessCreate.TargetProcessId;
@@ -295,9 +303,10 @@ static VOID NTAPI KsiCommsCallback(
 			}
 			else
 				msg->Reply.ProcessCreate.CreationStatus = STATUS_SUCCESS;
+			
 			KphCommsReplyMessage(ReplyToken, msg);
 
-			PhFreeToFreeList(freelist, msg);
+			PhDereferenceObject(msg);
 
 			break;
 		}
@@ -361,6 +370,145 @@ static VOID NTAPI KsiCommsCallback(
 			break;
 		}*/
 	}
+}
+
+BOOLEAN g_MonitorDebug = FALSE;
+BOOLEAN g_MonitorSystem = FALSE;
+
+/**
+ * @brief Configures the kernel driver's informer (event notification) system.
+ *
+ * The driver uses three levels of settings that filter events in sequence:
+ *
+ * 1. GLOBAL SETTINGS (KphSetInformerSettings):
+ *    - System-wide master switch controlling what events the driver generates
+ *    - Affects ALL connected clients
+ *    - If an event type is disabled here, no client receives it
+ *
+ * 2. PER-PROCESS SETTINGS (KphSetInformerProcessSettings):
+ *    - Filters events ABOUT a specific process (identified by handle)
+ *    - Used to prevent feedback loops / "log explosion" where monitoring
+ *      our own activity generates more events to monitor
+ *    - Example: Mute file events about ourselves to prevent infinite loop:
+ *      TaskExplorer logs -> writes file -> driver sees write -> generates event
+ *      -> TaskExplorer logs -> writes file -> ... (explosion)
+ *
+ * 3. PER-CLIENT SETTINGS (KphSetInformerClientSettings):
+ *    - Settings specific to THIS client connection
+ *    - Multiple clients can connect with different settings
+ *    - Controls message timeouts and per-client rate limiting
+ *    - Events must pass both global AND client filters to be received
+ *
+ * Flow: Driver generates event -> Global filter -> Process filter -> Client filter -> Received
+ */
+VOID PhInformerActivate(
+	VOID
+)
+{
+	KPH_INFORMER_SETTINGS settings;
+	KPH_INFORMER_CLIENT_SETTINGS client;
+
+	//
+	// STEP 1: Configure PER-PROCESS settings for our own process
+	//
+	// This prevents the "feedback loop" problem where monitoring our own
+	// activity would cause an explosion of events. We mute all events
+	// ABOUT ourselves, except RequiredStateFailure which is critical
+	// security feedback we need to see (e.g., if our process state degrades).
+	//
+	memset(&settings, 0, sizeof(settings));
+	settings.Policy[KPH_INFORMER_INDEX(RequiredStateFailure)] = KPH_RATE_LIMIT_UNLIMITED;
+	KphSetInformerProcessSettings(NtCurrentProcess(), &settings);
+
+	//
+	// If no monitoring features are enabled, disable all global events
+	// and return early - no need to configure client settings.
+	//
+	if (!g_MonitorDebug && !g_MonitorSystem)
+	{
+		KphSetInformerSettings(&settings);
+		return;
+	}
+
+	//
+	// STEP 2: Configure GLOBAL settings (affects all clients system-wide)
+	//
+	// Enable most informer option flags but disable expensive/unnecessary ones:
+	// - Stack traces: Performance overhead, not needed for basic monitoring
+	// - Reply modes: We don't need to intercept/block operations
+	// - Buffer captures: Large data transfers we don't need
+	//
+	memset(&settings, 0, sizeof(settings));
+	//settings.Options.Flags = ULONG_MAX;						// Enable most options
+	//settings.Options.EnableStackTraces = FALSE;				// Skip expensive stack capture
+	//settings.Options.EnableProcessCreateReply = FALSE;		// Don't need to reply/block process creation
+	//settings.Options.FileEnablePreCreateReply = FALSE;		// Don't need to reply to file pre-create
+	//settings.Options.FileEnablePostCreateReply = FALSE;		// Don't need to reply to file post-create
+	//settings.Options.FileEnablePostFileNames = FALSE;		// Skip post-operation filename resolution
+	//settings.Options.FileEnableIoControlBuffers = FALSE;	// Skip IOCTL buffer capture
+	//settings.Options.FileEnableFsControlBuffers = FALSE;	// Skip FSCTL buffer capture
+	//settings.Options.FileEnableDirControlBuffers = FALSE;	// Skip directory control buffers
+	//settings.Options.RegEnablePostObjectNames = FALSE;		// Skip registry post-op object names
+	//settings.Options.RegEnablePostValueNames = FALSE;		// Skip registry post-op value names
+	//settings.Options.RegEnableValueBuffers = FALSE;			// Skip registry value buffer capture
+
+	//
+	// Start with all event types disabled (DENY_ALL), then selectively
+	// enable only the ones we need based on monitoring flags.
+	//
+	for (ULONG i = 0; i < KPH_INFORMER_COUNT; i++)
+		settings.Policy[i] = KPH_RATE_LIMIT_DENY_ALL;
+
+	// Enable kernel debug output monitoring if requested
+	if (g_MonitorDebug)
+		settings.Policy[KPH_INFORMER_INDEX(DebugPrint)] = KPH_RATE_LIMIT_UNLIMITED;
+	else
+		settings.Policy[KPH_INFORMER_INDEX(DebugPrint)] = KPH_RATE_LIMIT_DENY_ALL;
+
+	// Enable process creation monitoring if requested
+	if (g_MonitorSystem)
+	{
+		settings.Options.EnableProcessCreateReply = TRUE;	// Enable process creation reply to allow blocking if needed
+		settings.Policy[KPH_INFORMER_INDEX(ProcessCreate)] = KPH_RATE_LIMIT_UNLIMITED;
+	}
+	else
+	{
+		settings.Policy[KPH_INFORMER_INDEX(ProcessCreate)] = KPH_RATE_LIMIT_DENY_ALL;
+	}
+
+	// Apply the global settings - this affects what the driver generates
+	KphSetInformerSettings(&settings);
+
+	//
+	// STEP 3: Configure PER-CLIENT settings (specific to this connection)
+	//
+	// These settings control how messages are delivered to THIS client:
+	// - Message timeouts: How long the driver waits for us to process messages
+	// - AsyncQueuePolicy: Rate limiting for the async message queue
+	// - InformerPolicy: Per-message-type rate limits for this client only
+	//
+	// Multiple clients can connect with different settings. Even if global
+	// settings enable an event, a client can filter it out here.
+	//
+	memset(&client, 0, sizeof(client));
+
+	// Set timeouts for synchronous message processing (3 seconds each)
+	PhTimeoutFromMilliseconds(&client.MessageTimeouts.AsyncTimeout, 3000);
+	PhTimeoutFromMilliseconds(&client.MessageTimeouts.DefaultTimeout, 3000);
+	PhTimeoutFromMilliseconds(&client.MessageTimeouts.ProcessCreateTimeout, 3000);
+	PhTimeoutFromMilliseconds(&client.MessageTimeouts.FilePreCreateTimeout, 3000);
+	PhTimeoutFromMilliseconds(&client.MessageTimeouts.FilePostCreateTimeout, 3000);
+
+	// Allow unlimited async queue throughput (no rate limiting on our end)
+	//client.AsyncQueuePolicy = KPH_RATE_LIMIT_PER_SEC(1000, 30000);
+	client.AsyncQueuePolicy = KPH_RATE_LIMIT_UNLIMITED;
+
+	// Accept all message types that pass the global filter (no additional client-side filtering)
+	for (ULONG i = 0; i < KPH_INFORMER_COUNT; i++)
+		client.InformerPolicy[i] = KPH_RATE_LIMIT_UNLIMITED;
+
+	// Apply the client-specific settings
+	KphSetInformerClientSettings(&client);
 }
 
 NTSTATUS KsiReadConfiguration(
@@ -501,6 +649,26 @@ CleanupExit:
 
 }
 
+
+bool KphSetDebugLog(bool Enable)
+{
+	g_MonitorDebug = Enable ? TRUE : FALSE;
+	PhInformerActivate();
+	return false;
+}
+
+bool KphSetSystemMon(bool Enable)
+{
+	g_MonitorSystem = Enable ? TRUE : FALSE;
+	PhInformerActivate();
+	return false;
+}
+
+bool KphGetSystemMon()
+{
+	return g_MonitorSystem;
+}
+
 PPH_STRING KsiServiceName = NULL;
 BOOLEAN KsiEnableLoadNative = FALSE;
 BOOLEAN KsiEnableLoadFilter = FALSE;
@@ -545,6 +713,25 @@ NTSTATUS PhRestartSelf(
 		&commandlineSr,
 		AdditionalCommandLine
 	);
+
+	QString ServiceName = CTaskService::RunService();
+	if (!ServiceName.isEmpty())
+	{
+		QVariantMap Parameters;
+		Parameters["CommandLine"] = QString::fromWCharArray(PhGetString(commandline));
+#ifndef DEBUG
+		Parameters["MitigationFlags0"] = mitigationFlags[0];
+		Parameters["MitigationFlags1"] = mitigationFlags[1];
+#endif
+
+		QVariantMap Request;
+		Request["Command"] = "CreateProcessForKsi";
+		Request["Parameters"] = Parameters;
+
+		QVariant Response = CTaskService::SendCommand(ServiceName, Request);
+		if (Response.isValid())
+			PhExitApplication(STATUS_SUCCESS);
+	}
 
 #ifndef DEBUG
 	status = PhInitializeProcThreadAttributeList(&attributeList, 1);
@@ -653,6 +840,36 @@ bool IsOnARM64()
 
 bool g_KsiDynDataLoaded = false;
 
+STATUS KsiActivateDynData(const QString& FileName, _In_ KPH_LEVEL Level)
+{
+	STATUS Status = OK;
+
+	NTSTATUS status;
+	PBYTE dynData = NULL;
+	ULONG dynDataLength;
+	PBYTE signature = NULL;
+	ULONG signatureLength;
+
+	status = KsiGetDynData(Split2(FileName, "\\", true).first, &dynData, &dynDataLength, &signature, &signatureLength);
+	if (!NT_SUCCESS(status))
+		Status = ERR("Unsupported windows version.", STATUS_UNKNOWN_REVISION);
+	else
+	{
+		status = KphActivateDynData(dynData, dynDataLength, signature, signatureLength);
+		if (!NT_SUCCESS(status))
+			Status = ERR("KphActivateDynData Failed.", status);
+		else
+			g_KsiDynDataLoaded = true;
+	}
+
+	if (signature)
+		PhFree(signature);
+	if (dynData)
+		PhFree(dynData);
+
+	return Status;
+}
+
 STATUS InitKSI(const QString& AppDir)
 {
 	QString FileName = theConf->GetString("OptionsKSI/FileName", "KTaskExplorer.sys");
@@ -660,6 +877,7 @@ STATUS InitKSI(const QString& AppDir)
 	QString ObjectName = "\\Driver\\" + ServiceName;
 	QString PortName = "\\" + ServiceName;
 	QString Altitude = theConf->GetString("OptionsKSI/Altitude", "385210.8");
+	QStringList Info;
 
 	KsiEnableLoadNative = theConf->GetBool("OptionsKSI/EnableLoadNative", false);
 	KsiEnableLoadFilter = theConf->GetBool("OptionsKSI/EnableLoadFilter", false);
@@ -701,24 +919,28 @@ STATUS InitKSI(const QString& AppDir)
 	STATUS Status = OK;
 	KsiServiceName = CastQString(ServiceName);
 	PPH_STRING ksiFileName = CastQString(FileName);
+	KPH_CONFIG_PARAMETERS config = { 0 };
 	PPH_STRING objectName = CastQString(ObjectName);
 	PPH_STRING portName = CastQString(PortName);
 	PPH_STRING altitude = CastQString(Altitude);
-
+	PPH_STRING systemProcessName = NULL; //CastQString("System Informer Kernel");
+	KPH_LEVEL level;
+	KPH_PROCESS_STATE processState;
+	
 	UNICODE_STRING fileName;
 	WCHAR buffer[MAX_PATH];
 	DWORD size = GetProcessImageFileNameW(GetCurrentProcess(), buffer, MAX_PATH);
-	wcsrchr(buffer, L'\\')[0] = 0;
+	*wcsrchr(buffer, L'\\') = '\0';
 	UNICODE_STRING ustr;
 	RtlInitUnicodeString(&ustr, buffer);
 	PPH_STRING clientPath = PhCreateStringFromUnicodeString(&ustr);
 
-	KPH_CONFIG_PARAMETERS config = { 0 };
 	config.FileName = &ksiFileName->sr;
 	config.ServiceName = &KsiServiceName->sr;
 	config.ObjectName = &objectName->sr;
 	config.PortName = &portName->sr;
 	config.Altitude = &altitude->sr;
+	config.SystemProcessName = (systemProcessName ? &systemProcessName->sr : NULL);
 
 	config.FsSupportedFeatures = 0; // not yet in driver?
 	if (theConf->GetBool("OptionsKSI/EnableFsFeatureOffloadRead", false))
@@ -739,11 +961,9 @@ STATUS InitKSI(const QString& AppDir)
 	config.Flags.AllowDebugging = theConf->GetBool("OptionsKSI/AllowDebugging", false);
 #endif
 	config.Flags.RandomizedPoolTag = theConf->GetBool("OptionsKSI/RandomizedPoolTag", false);
-#ifdef _DEBUG 
-	config.Flags.DynDataNoEmbedded = theConf->GetBool("OptionsKSI/DynDataNoEmbedded", true);
-#else
 	config.Flags.DynDataNoEmbedded = theConf->GetBool("OptionsKSI/DynDataNoEmbedded", false);
-#endif
+	config.Flags.DisableSystemProcess = theConf->GetBool("OptionsKSI/DisableSystemProcess", false);
+	config.Flags.DisableThreadNames = theConf->GetBool("OptionsKSI/DisableThreadNames", false);
 
 //#ifndef _DEBUG
 	config.ClientPath = &clientPath->sr;
@@ -752,124 +972,165 @@ STATUS InitKSI(const QString& AppDir)
 	config.EnableNativeLoad = KsiEnableLoadNative;
 	config.EnableFilterLoad = KsiEnableLoadFilter;
 
+	config.RingBufferLength = theConf->GetInt("OptionsKSI/RingBufferLength", 10000000); // in bytes 10MB
 	config.Callback = (PKPH_COMMS_CALLBACK)KsiCommsCallback;
 
 	status = KphConnect(&config);
-	if (!NT_SUCCESS(status))
-		Status = ERR("KphConnect Failed.", status);
-	else
+
+	if (status == STATUS_NO_SUCH_FILE)
 	{
-		KPH_LEVEL level = KphLevelEx(FALSE);
+		//PPH_STRING tempFileName;
 
-		PBYTE dynData = NULL;
-		ULONG dynDataLength;
-		PBYTE signature = NULL;
-		ULONG signatureLength;
+		//
+		// N.B. We know the driver file exists from the check above. This
+		// error indicates that the kernel driver is still mapped but
+		// unloaded.
+		//
+		// The chain of calls and resulting return status is this:
+		// IopLoadDriver
+		// -> MmLoadSystemImage -> STATUS_IMAGE_ALREADY_LOADED
+		// -> ObOpenObjectByName -> STATUS_OBJECT_NAME_NOT_FOUND
+		// -> STATUS_DRIVER_FAILED_PRIOR_UNLOAD -> STATUS_NO_SUCH_FILE
+		//
+		// The driver object has been made temporary and the underlying
+		// section will be unmapped by the kernel when it is safe to do so.
+		// This generally happens when the pinned module is holding the
+		// driver in memory until some code finishes executing. This can
+		// also happen if another misbehaving driver is leaking or holding
+		// a reference to the driver object.
+		//
+		// To continue to provide a good user experience, we will attempt copy
+		// the driver to another file and load it again. First, try to use an
+		// existing temporary driver file, if one exists.
+		//
 
-		status = KsiGetDynData(Split2(FileName, "\\", true).first, &dynData, &dynDataLength, &signature, &signatureLength);
-		if (!NT_SUCCESS(status))
-			Status = ERR("Unsupported windows version.", STATUS_UNKNOWN_REVISION);
-		else
+		//tempFileName = PhGetStringSetting(SETTING_KSI_PREVIOUS_TEMPORARY_DRIVER_FILE);
+		//if (tempFileName)
+		//{
+		//	if (PhDoesFileExistWin32(PhGetString(tempFileName)))
+		//	{
+		//		config.FileName = &tempFileName->sr;
+		//
+		//		status = KphConnect(&config);
+		//	}
+		//
+		//	PhMoveReference(&KsiFileName, tempFileName);
+		//}
+
+		//if (!NT_SUCCESS(status) && tempDriverDir)
+		//{
+		//	if (NT_SUCCESS(status = KsiCreateTemporaryDriverFile(ksiFileName, tempDriverDir, &tempFileName)))
+		//	{
+		//		PhSetStringSetting(SETTING_KSI_PREVIOUS_TEMPORARY_DRIVER_FILE, PhGetString(tempFileName));
+		//
+		//		config.FileName = &tempFileName->sr;
+		//
+		//		status = KphConnect(&config);
+		//
+		//		PhMoveReference(&KsiFileName, tempFileName);
+		//	}
+		//}
+	}
+
+	if (status == STATUS_SI_KSIDLL_VERSION_MISMATCH || status == STATUS_PROCEDURE_NOT_FOUND)
+	{
+		Status = ERR("The last System Informer update requires a reboot.", status);
+		goto CleanupExit;
+	}
+
+	if (!NT_SUCCESS(status)) {
+		Status = ERR("KphConnect Failed.", status);
+		goto CleanupExit;
+	}
+	
+	level = KphLevelEx(FALSE);
+
+	processState = KphGetCurrentProcessState();
+	if ((processState != 0) && (processState & KPH_PROCESS_STATE_MAXIMUM) != KPH_PROCESS_STATE_MAXIMUM)
+	{
+		if (!BooleanFlagOn(processState, KPH_PROCESS_SECURELY_CREATED))
+			Info.append("not securely created");
+		if (!BooleanFlagOn(processState, KPH_PROCESS_VERIFIED_PROCESS))
+			Info.append("unverified primary image");
+		if (!BooleanFlagOn(processState, KPH_PROCESS_PROTECTED_PROCESS))
+			Info.append("inactive protections");
+		if (!BooleanFlagOn(processState, KPH_PROCESS_NO_UNTRUSTED_IMAGES))
+			Info.append("unsigned images (likely an unsigned plugin)");
+		if (!BooleanFlagOn(processState, KPH_PROCESS_NOT_BEING_DEBUGGED))
+			Info.append("process is being debugged");
+		if (!BooleanFlagOn(processState, KPH_PROCESS_NO_WRITABLE_FILE_OBJECT))
+			Info.append("writable file object");
+		if (!BooleanFlagOn(processState, KPH_PROCESS_CREATE_NOTIFICATION))
+			Info.append("missing create notification");
+		//if (!BooleanFlagOn(processState, KPH_PROCESS_NO_VERIFY_TIMEOUT))
+		//	Info.append("verify time out");
+		if ((processState & KPH_PROCESS_STATE_MINIMUM) != KPH_PROCESS_STATE_MINIMUM)
+			Info.append("tampered primary image");
+	}
+
+	Status = KsiActivateDynData(FileName, level);
+
+	if (level != KphLevelMax)
+	{
+		Status = ERR(QString("Unable to access the kernel driver: %1.").arg(Info.join(", ")), STATUS_ACCESS_DENIED);
+
+		if (config.Flags.AllowDebugging || !NtCurrentPeb()->BeingDebugged)
 		{
-			status = KphActivateDynData(dynData, dynDataLength, signature, signatureLength);
+			if ((level == KphLevelHigh) && !g_KphStartupMax)
+			{
+				PH_STRINGREF commandline = PH_STRINGREF_INIT(L" -kx");
+				status = PhRestartSelf(&commandline);
+			}
+
+			if ((level < KphLevelHigh) && !g_KphStartupMax && !g_KphStartupHigh)
+			{
+				PH_STRINGREF commandline = PH_STRINGREF_INIT(L" -kh");
+				status = PhRestartSelf(&commandline);
+			}
+
 			if (!NT_SUCCESS(status))
-				Status = ERR("KphActivateDynData Failed.", status);
-			else
-				g_KsiDynDataLoaded = true;
-		}
-
-		if (signature)
-			PhFree(signature);
-		if (dynData)
-			PhFree(dynData);
-
-
-		QStringList Info;
-
-		KPH_PROCESS_STATE processState = KphGetCurrentProcessState();
-		if ((processState != 0) && (processState & KPH_PROCESS_STATE_MAXIMUM) != KPH_PROCESS_STATE_MAXIMUM)
-		{
-			if (!BooleanFlagOn(processState, KPH_PROCESS_SECURELY_CREATED))
-				Info.append("not securely created");
-			if (!BooleanFlagOn(processState, KPH_PROCESS_VERIFIED_PROCESS))
-				Info.append("unverified primary image");
-			if (!BooleanFlagOn(processState, KPH_PROCESS_PROTECTED_PROCESS))
-				Info.append("inactive protections");
-			if (!BooleanFlagOn(processState, KPH_PROCESS_NO_UNTRUSTED_IMAGES))
-				Info.append("unsigned images (likely an unsigned plugin)");
-			if (!BooleanFlagOn(processState, KPH_PROCESS_NOT_BEING_DEBUGGED))
-				Info.append("process is being debugged");
-			if (!BooleanFlagOn(processState, KPH_PROCESS_NO_VERIFY_TIMEOUT))
-				Info.append("verify time out");
-			if ((processState & KPH_PROCESS_STATE_MINIMUM) != KPH_PROCESS_STATE_MINIMUM)
-				Info.append("tampered primary image");
-		}
-
-		Status = OK;
-
-		if (level != KphLevelMax)
-		{
-			Status = ERR(QString("Unable to access the kernel driver: %1.").arg(Info.join(", ")), STATUS_ACCESS_DENIED);
-
-			if (config.Flags.AllowDebugging || !NtCurrentPeb()->BeingDebugged)
-			{
-				if ((level == KphLevelHigh) && !g_KphStartupMax)
-				{
-					PH_STRINGREF commandline = PH_STRINGREF_INIT(L" -kx");
-					status = PhRestartSelf(&commandline);
-				}
-
-				if ((level < KphLevelHigh) && !g_KphStartupMax && !g_KphStartupHigh)
-				{
-					PH_STRINGREF commandline = PH_STRINGREF_INIT(L" -kh");
-					status = PhRestartSelf(&commandline);
-				}
-
-				if (!NT_SUCCESS(status))
-					Status = ERR("PhRestartSelf failed.", STATUS_ACCESS_DENIED);
-			}
-		}
-
-		if (level == KphLevelMax)
-		{
-			ACCESS_MASK process = 0;
-			ACCESS_MASK thread = 0;
-
-			if (theConf->GetBool("OptionsKSI/EnableUnloadProtection", false)) {
-				if(NT_SUCCESS(KphAcquireDriverUnloadProtection(NULL, NULL)))
-					KsiEnableUnloadProtection = TRUE;
-			}
-
-			switch (theConf->GetInt("OptionsKSI/ClientProcessProtectionLevel", 0))
-			{
-			case 2:
-				process |= (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION);
-				thread |= (THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION);
-				__fallthrough;
-			case 1:
-				process |= (PROCESS_TERMINATE | PROCESS_SUSPEND_RESUME);
-				thread |= (THREAD_TERMINATE | THREAD_SUSPEND_RESUME | THREAD_RESUME);
-				__fallthrough;
-			case 0:
-			default:
-				break;
-			}
-
-			if (process != 0 || thread != 0)
-				KphStripProtectedProcessMasks(NtCurrentProcess(), process, thread);
+				Status = ERR("PhRestartSelf failed.", STATUS_ACCESS_DENIED);
 		}
 	}
 
-	if (ksiFileName)
-		PhDereferenceObject(ksiFileName);
-	if (objectName)
-		PhDereferenceObject(objectName);
-	if (altitude)
-		PhDereferenceObject(altitude);
-	if (portName)
-		PhDereferenceObject(portName);
-	if (clientPath)
-		PhDereferenceObject(clientPath);
+	if (level == KphLevelMax)
+	{
+		ACCESS_MASK process = 0;
+		ACCESS_MASK thread = 0;
+
+		if (theConf->GetBool("OptionsKSI/EnableUnloadProtection", false)) {
+			if(NT_SUCCESS(KphAcquireDriverUnloadProtection(NULL, NULL)))
+				KsiEnableUnloadProtection = TRUE;
+		}
+
+		switch (theConf->GetInt("OptionsKSI/ClientProcessProtectionLevel", 0))
+		{
+		case 2:
+			process |= (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION);
+			thread |= (THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION);
+			__fallthrough;
+		case 1:
+			process |= (PROCESS_TERMINATE | PROCESS_SUSPEND_RESUME);
+			thread |= (THREAD_TERMINATE | THREAD_SUSPEND_RESUME | THREAD_RESUME);
+			__fallthrough;
+		case 0:
+		default:
+			break;
+		}
+
+		if (process != 0 || thread != 0)
+			KphStripProtectedProcessMasks(NtCurrentProcess(), process, thread);
+	}
+
+	//PhInformerActivate();
+
+CleanupExit:
+
+	PhClearReference(&objectName);
+	PhClearReference(&portName);
+	PhClearReference(&altitude);
+	PhClearReference(&ksiFileName);
+	PhClearReference(&clientPath);
 
 //#ifdef DEBUG
 //	KsiDebugLogInitialize();
@@ -1093,42 +1354,6 @@ STATUS TryUpdateDynData(const QString& AppDir)
 	Progress.exec();
 
 	return Status;
-}
-
-bool KphSetDebugLog(bool Enable)
-{
-	NTSTATUS status;
-	KPH_INFORMER_SETTINGS Settings;
-	if (NT_SUCCESS(status = KphGetInformerSettings(&Settings))) {
-		Settings.DebugPrint = Enable;
-		status = KphSetInformerSettings(&Settings);
-	}
-	return NT_SUCCESS(status);
-}
-
-bool KphSetSystemMon(bool Enable)
-{
-	if (!KphCommsIsConnected())
-		return false;
-
-	NTSTATUS status;
-	KPH_INFORMER_SETTINGS Settings;
-	if (NT_SUCCESS(status = KphGetInformerSettings(&Settings))) {
-		Settings.ProcessCreate = Enable;
-		status = KphSetInformerSettings(&Settings);
-	}
-	return NT_SUCCESS(status);
-}
-
-bool KphGetSystemMon()
-{
-	if (!KphCommsIsConnected())
-		return false;
-
-	KPH_INFORMER_SETTINGS Settings;
-	if (NT_SUCCESS(KphGetInformerSettings(&Settings)))
-		return Settings.ProcessCreate;
-	return false;
 }
 
 static PPH_STRING KsiKernelFileName = NULL;

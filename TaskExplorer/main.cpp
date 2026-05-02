@@ -196,11 +196,6 @@ int main(int argc, char *argv[])
 	else if (!bSvc && !bWrk)
 #endif
 	{
-		if (theConf->GetBool("OptionsKSI/KsiEnable", true) && IsElevated() && !PhIsExecutingInWow64())
-		{
-			DrvStatus = InitKSI(AppDir);
-		}
-
 		// this must be done before we create QApplication
 		int DPI = theConf->GetInt("Options/DPIScaling", 1);
 		if (DPI == 1) {
@@ -227,6 +222,11 @@ int main(int argc, char *argv[])
 
 		//new QApplication(argc, argv);
 		pApp = new QtSingleApplication((IsElevated() || bTestElevated) ? "TaskExplorer" : "UTaskExplorer", argc, argv);
+
+		if (theConf->GetBool("OptionsKSI/KsiEnable", true) && IsElevated() && !PhIsExecutingInWow64())
+		{
+			DrvStatus = InitKSI(AppDir);
+		}
 	}
 
 	if (pApp)

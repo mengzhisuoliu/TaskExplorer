@@ -104,6 +104,7 @@ typeof(&UnDecorateSymbolNameW) UnDecorateSymbolNameW_I = NULL;
 _SymGetDiaSource SymGetDiaSource_I = NULL;
 _SymGetDiaSession SymGetDiaSession_I = NULL;
 _SymFreeDiaString SymFreeDiaString_I = NULL;
+static ULONG PhSymbolProviderInternalOptions = PH_SYMOPT_VERIFY_MICROSOFT_CHAIN;
 
 PPH_SYMBOL_PROVIDER PhCreateSymbolProvider(
     _In_opt_ HANDLE ProcessId
@@ -127,7 +128,7 @@ PPH_SYMBOL_PROVIDER PhCreateSymbolProvider(
 
     if (ProcessId)
     {
-        static ACCESS_MASK accesses[] =
+        static const ACCESS_MASK accesses[] =
         {
             //STANDARD_RIGHTS_REQUIRED | SYNCHRONIZE | 0xfff, // pre-Vista full access
             PROCESS_QUERY_INFORMATION | PROCESS_VM_READ | PROCESS_DUP_HANDLE,
@@ -1380,12 +1381,13 @@ VOID PhLoadSymbolProviderModules(
     }
 }
 
-VOID PhLoadModulesForVirtualSymbolProvider(
+NTSTATUS PhLoadModulesForVirtualSymbolProvider(
     _In_ PPH_SYMBOL_PROVIDER SymbolProvider,
     _In_opt_ HANDLE ProcessId,
     _In_opt_ HANDLE ProcessHandle
     )
 {
+    NTSTATUS status;
     PH_LOAD_SYMBOLS_CONTEXT context;
     HANDLE processHandle = NULL;
     BOOLEAN closeHandle = FALSE;
@@ -1396,18 +1398,33 @@ VOID PhLoadModulesForVirtualSymbolProvider(
     if (SymbolProvider->IsRealHandle)
     {
         processHandle = SymbolProvider->ProcessHandle;
+        status = STATUS_SUCCESS;
     }
     else if (ProcessHandle)
     {
         processHandle = ProcessHandle;
+        status = STATUS_SUCCESS;
     }
-    else
+    else if (ProcessId)
     {
-        if (NT_SUCCESS(PhOpenProcess(&processHandle, PROCESS_QUERY_LIMITED_INFORMATION, ProcessId)))
+        status = PhOpenProcess(
+            &processHandle,
+            PROCESS_QUERY_LIMITED_INFORMATION,
+            ProcessId
+            );
+
+        if (NT_SUCCESS(status))
         {
             closeHandle = TRUE;
         }
     }
+    else
+    {
+        status = STATUS_INVALID_PARAMETER_1;
+    }
+
+    if (!NT_SUCCESS(status))
+        return status;
 
     // Load symbols for process modules.
     if (ProcessId != SYSTEM_IDLE_PROCESS_ID && processHandle)
@@ -1458,6 +1475,8 @@ VOID PhLoadModulesForVirtualSymbolProvider(
     {
         NtClose(processHandle);
     }
+
+    return status;
 }
 
 static const PH_FLAG_MAPPING PhSymbolProviderOptions[] =
@@ -1473,6 +1492,15 @@ VOID PhSetOptionsSymbolProvider(
     ULONG options;
     ULONG mask = 0;
     ULONG value = 0;
+    ULONG internalMask;
+
+    internalMask = Mask & PH_SYMOPT_VERIFY_MICROSOFT_CHAIN;
+
+    if (internalMask)
+    {
+        PhSymbolProviderInternalOptions =
+            (PhSymbolProviderInternalOptions & ~internalMask) | (Value & internalMask);
+    }
 
     PhpRegisterSymbolProvider(NULL);
 
@@ -1544,7 +1572,7 @@ NTSTATUS PhpLookupDynamicFunctionTable(
     ULONG i;
     BOOLEAN foundNull;
 
-    rtlGetFunctionTableListHead = PhGetDllProcedureAddress(L"ntdll.dll", "RtlGetFunctionTableListHead", 0);
+    rtlGetFunctionTableListHead = PhGetDllProcedureAddressZ(L"ntdll.dll", "RtlGetFunctionTableListHead", 0);
 
     if (!rtlGetFunctionTableListHead)
         return STATUS_PROCEDURE_NOT_FOUND;
@@ -1746,7 +1774,8 @@ NTSTATUS PhpAccessCallbackFunctionTable(
 
         // Verify the signature is valid and the certificate chained to Microsoft (dmex)
 
-        if (!PhVerifyFileIsChainedToMicrosoft(&fileName, FALSE))
+        if (FlagOn(PhSymbolProviderInternalOptions, PH_SYMOPT_VERIFY_MICROSOFT_CHAIN) &&
+            !PhVerifyFileIsChainedToMicrosoft(&fileName, FALSE))
         {
             return STATUS_ACCESS_DISABLED_BY_POLICY_DEFAULT;
         }
@@ -2236,7 +2265,7 @@ NTSTATUS PhWalkThreadStack(
     // Kernel stack walk.
     if ((Flags & PH_WALK_KERNEL_STACK) && (KsiLevel() >= KphLevelMed))
     {
-        PVOID stack[256 - 2]; // See MAX_STACK_DEPTH
+        PVOID stack[256];
         ULONG capturedFrames = 0;
         ULONG i;
 
@@ -2732,7 +2761,7 @@ BOOLEAN PhEnumerateSymbols(
         return FALSE;
 
     if (!SymEnumSymbolsW_I)
-        SymEnumSymbolsW_I = PhGetDllProcedureAddress(L"dbghelp.dll", "SymEnumSymbolsW", 0);
+        SymEnumSymbolsW_I = PhGetDllProcedureAddressZ(L"dbghelp.dll", "SymEnumSymbolsW", 0);
 
     if (!SymEnumSymbolsW_I)
     {
@@ -2775,7 +2804,7 @@ BOOLEAN PhGetSymbolProviderDiaSource(
         return FALSE;
 
     if (!SymGetDiaSource_I)
-        SymGetDiaSource_I = PhGetDllProcedureAddress(L"dbghelp.dll", "SymGetDiaSource", 0);
+        SymGetDiaSource_I = PhGetDllProcedureAddressZ(L"dbghelp.dll", "SymGetDiaSource", 0);
     if (!SymGetDiaSource_I)
         return FALSE;
 
@@ -2813,7 +2842,7 @@ BOOLEAN PhGetSymbolProviderDiaSession(
         return FALSE;
 
     if (!SymGetDiaSession_I)
-        SymGetDiaSession_I = PhGetDllProcedureAddress(L"dbghelp.dll", "SymGetDiaSession", 0);
+        SymGetDiaSession_I = PhGetDllProcedureAddressZ(L"dbghelp.dll", "SymGetDiaSession", 0);
     if (!SymGetDiaSession_I)
         return FALSE;
 
@@ -2842,7 +2871,7 @@ VOID PhSymbolProviderFreeDiaString(
     )
 {
     if ((SymGetDiaSession_I || SymGetDiaSource_I) && !SymFreeDiaString_I)
-        SymFreeDiaString_I = PhGetDllProcedureAddress(L"dbghelp.dll", "SymFreeDiaString", 0);
+        SymFreeDiaString_I = PhGetDllProcedureAddressZ(L"dbghelp.dll", "SymFreeDiaString", 0);
     if (!SymFreeDiaString_I)
         return;
 
@@ -3098,9 +3127,9 @@ BOOLEAN PhGetLineFromInlineContext(
 //        return NULL;
 //
 //    if (!SymAddrIncludeInlineTrace_I)
-//        SymAddrIncludeInlineTrace_I = PhGetDllProcedureAddress(L"dbghelp.dll", "SymAddrIncludeInlineTrace", 0);
+//        SymAddrIncludeInlineTrace_I = PhGetDllProcedureAddressZ(L"dbghelp.dll", "SymAddrIncludeInlineTrace", 0);
 //    if (!SymQueryInlineTrace_I)
-//        SymQueryInlineTrace_I = PhGetDllProcedureAddress(L"dbghelp.dll", "SymQueryInlineTrace", 0);
+//        SymQueryInlineTrace_I = PhGetDllProcedureAddressZ(L"dbghelp.dll", "SymQueryInlineTrace", 0);
 //
 //    if (!(
 //        SymAddrIncludeInlineTrace_I &&

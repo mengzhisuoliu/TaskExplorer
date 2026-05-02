@@ -81,7 +81,7 @@ struct SWinProcess
 
 		KnownProcessType = -1;
 
-		KphProcessState = 0;
+		KphProcessState = (KPH_PROCESS_STATE)0;
 
 		ReferenceCount = 0;
 		AccessMask = 0;
@@ -3597,7 +3597,8 @@ NTSTATUS CWinProcess__LoadModule(HANDLE ProcessHandle, const QString& Path)
 	if (!isModule32)
 	{
 #endif
-		threadStart = PhGetDllProcedureAddress(L"kernel32.dll", "LoadLibraryW", 0);
+		static PH_STRINGREF kernel32_dll = PH_STRINGREF_INIT(L"kernel32.dll");
+		threadStart = PhGetDllProcedureAddress(&kernel32_dll, "LoadLibraryW", 0);
 #ifdef _WIN64
 	}
 	else

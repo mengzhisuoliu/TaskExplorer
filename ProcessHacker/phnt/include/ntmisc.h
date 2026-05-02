@@ -11,6 +11,7 @@
 // Apphelp
 //
 
+_Enum_is_bitflag_
 typedef enum _AHC_INFO_CLASS
 {
     AhcInfoClassSdbQueryResult          = 0x00000001,
@@ -250,6 +251,7 @@ typedef struct _AHC_SERVICE_DATA
     ULONG ParamsOutSize;                        // Parameters out size.
 } AHC_SERVICE_DATA, *PAHC_SERVICE_DATA;
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -282,6 +284,7 @@ typedef enum _VDMSERVICECLASS
     VdmPreInitialize
 } VDMSERVICECLASS, *PVDMSERVICECLASS;
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -321,6 +324,7 @@ typedef enum _IO_SESSION_STATE
 
 #if (PHNT_MODE != PHNT_MODE_KERNEL)
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -330,6 +334,7 @@ NtOpenSession(
     _In_ POBJECT_ATTRIBUTES ObjectAttributes
     );
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -350,8 +355,19 @@ NtNotifyChangeSession(
 // ApiSet
 //
 
+#if (PHNT_VERSION >= PHNT_WINDOWS_11)
 NTSYSAPI
-BOOL
+NTSTATUS
+NTAPI
+ApiSetGetImplementationHost(
+    _In_ PCSTR ApiSetName,
+    _Out_ PBOOLEAN Resolved,
+    _Out_ PUNICODE_STRING HostName
+    );
+#endif // (PHNT_VERSION >= PHNT_WINDOWS_11)
+
+NTSYSAPI
+LOGICAL
 NTAPI
 ApiSetQueryApiSetPresence(
     _In_ PCUNICODE_STRING Namespace,
@@ -359,7 +375,7 @@ ApiSetQueryApiSetPresence(
     );
 
 NTSYSAPI
-BOOL
+LOGICAL
 NTAPI
 ApiSetQueryApiSetPresenceEx(
     _In_ PCUNICODE_STRING Namespace,
@@ -378,6 +394,7 @@ typedef enum _SECURE_SETTING_VALUE_TYPE
 
 #if (PHNT_VERSION >= PHNT_WINDOWS_10_RS1)
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -393,6 +410,7 @@ NtQuerySecurityPolicy(
 
 #if (PHNT_VERSION >= PHNT_WINDOWS_10_20H1)
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -406,6 +424,7 @@ NtCreateCrossVmEvent(
     );
 
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -419,6 +438,7 @@ NtCreateCrossVmMutant(
     );
 
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -430,6 +450,7 @@ NtAcquireCrossVmMutant(
 
 #if (PHNT_VERSION >= PHNT_WINDOWS_10_20H1)
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -444,6 +465,7 @@ NtDirectGraphicsCall(
 
 #if (PHNT_VERSION >= PHNT_WINDOWS_11_22H2)
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -454,6 +476,7 @@ NtOpenCpuPartition(
     );
 
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -464,6 +487,7 @@ NtCreateCpuPartition(
     );
 
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -478,6 +502,7 @@ NtSetInformationCpuPartition(
     );
 
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -503,6 +528,7 @@ typedef enum _PROCESS_ACTIVITY_TYPE
 } PROCESS_ACTIVITY_TYPE;
 
 // rev
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -511,7 +537,6 @@ NtAcquireProcessActivityReference(
     _In_ HANDLE ParentProcessHandle,
     _In_ ULONG ProcessActivityType // PROCESS_ACTIVITY_TYPE
     );
-
 #endif // (PHNT_VERSION >= PHNT_WINDOWS_10_RS2)
 
 //
@@ -525,7 +550,7 @@ typedef struct _PACKAGE_CONTEXT_REFERENCE
 } *PACKAGE_CONTEXT_REFERENCE;
 
 // private
-typedef enum PackageProperty
+typedef enum _PackageProperty
 {
     PackageProperty_Name = 1,                  // q: WCHAR[]
     PackageProperty_Version = 2,               // q: WCHAR[]
@@ -551,7 +576,7 @@ typedef struct _PACKAGE_APPLICATION_CONTEXT_REFERENCE
 } *PACKAGE_APPLICATION_CONTEXT_REFERENCE;
 
 // private
-typedef enum PackageApplicationProperty
+typedef enum _PackageApplicationProperty
 {
     PackageApplicationProperty_Aumid = 1,                        // q: WCHAR[]
     PackageApplicationProperty_Praid = 2,                        // q: WCHAR[]
@@ -578,7 +603,7 @@ typedef struct _PACKAGE_RESOURCES_CONTEXT_REFERENCE
 } *PACKAGE_RESOURCES_CONTEXT_REFERENCE;
 
 // private
-typedef enum PackageResourcesProperty
+typedef enum _PackageResourcesProperty
 {
     PackageResourcesProperty_DisplayName = 1,
     PackageResourcesProperty_PublisherDisplayName = 2,
@@ -595,7 +620,7 @@ typedef struct _PACKAGE_SECURITY_CONTEXT_REFERENCE
 } *PACKAGE_SECURITY_CONTEXT_REFERENCE;
 
 // private
-typedef enum PackageSecurityProperty
+typedef enum _PackageSecurityProperty
 {
     PackageSecurityProperty_SecurityFlags = 1,     // q: ULONG
     PackageSecurityProperty_AppContainerSID = 2,   // q: Sid
@@ -610,7 +635,7 @@ typedef struct _TARGET_PLATFORM_CONTEXT_REFERENCE
 } *TARGET_PLATFORM_CONTEXT_REFERENCE;
 
 // private
-typedef enum TargetPlatformProperty
+typedef enum _TargetPlatformProperty
 {
     TargetPlatformProperty_Platform = 1,   // q: ULONG
     TargetPlatformProperty_MinVersion = 2, // q: PACKAGE_VERSION
@@ -624,7 +649,7 @@ typedef struct _PACKAGE_GLOBALIZATION_CONTEXT_REFERENCE
 } *PACKAGE_GLOBALIZATION_CONTEXT_REFERENCE;
 
 // private
-typedef enum PackageGlobalizationProperty
+typedef enum _PackageGlobalizationProperty
 {
     PackageGlobalizationProperty_ForceUtf8 = 1,                // q: ULONG
     PackageGlobalizationProperty_UseWindowsDisplayLanguage = 2 // q: ULONG
@@ -919,6 +944,7 @@ GetPackageGlobalizationProperty(
 //
 
 // private
+_Enum_is_bitflag_
 typedef enum _MTA_HOST_USAGE_FLAGS
 {
     MTA_HOST_USAGE_NONE = 0x0,
@@ -926,6 +952,7 @@ typedef enum _MTA_HOST_USAGE_FLAGS
     MTA_HOST_USAGE_ACTIVATORINITIALIZED = 0x2,
     MTA_HOST_USAGE_UNLOADCALLED = 0x4,
 } MTA_HOST_USAGE_FLAGS, *PMTA_HOST_USAGE_FLAGS;
+DEFINE_ENUM_FLAG_OPERATORS(MTA_HOST_USAGE_FLAGS);
 
 // private
 typedef struct _MTA_USAGE_GLOBALS
@@ -1154,5 +1181,62 @@ static_assert(sizeof(APPCOMPAT_EXE_DATA) == 0x11C0, "APPCOMPAT_EXE_DATA size mis
 #else
 static_assert(sizeof(APPCOMPAT_EXE_DATA) == 0xE98, "APPCOMPAT_EXE_DATA size mismatch");
 #endif
+
+//
+// Direct3D Kernel Mode Thunk (D3DKMT)
+//
+
+/**
+ * The D3DKMT_GET_PROCESS_LIST structure is used for retrieving a list of process handles using a graphics adapter.
+ * \remarks The caller is responsible for closing the returned process handles.
+ */
+// rev
+typedef struct _D3DKMT_GET_PROCESS_LIST
+{
+    LUID AdapterLuid;          // [in] The locally unique identifier (LUID) for the graphics adapter.
+    ULONG DesiredAccess;       // [in] The access rights to request for the process handles. This must be `PROCESS_QUERY_INFORMATION` (0x400).
+    ULONG ProcessHandleCount;  // [in, out] On input, specifies the number of handles the `ProcessHandle` member can hold. On output, receives the number of handles returned.
+    HANDLE ProcessHandle;      // [out] The first element of an array that receives the process handles.
+} D3DKMT_GET_PROCESS_LIST, *PD3DKMT_GET_PROCESS_LIST;
+
+// rev
+/**
+ * The D3DKMTGetProcessList function retrieves a list of processes that are using a specific graphics adapter.
+ *
+ * \param[in,out] GetProcessList A pointer to a \ref D3DKMT_GET_PROCESS_LIST structure that contains the processes using the graphics adapter.
+ * \return NTSTATUS Successful or errant status.
+ */
+EXTERN_C
+NTSTATUS
+NTAPI
+D3DKMTGetProcessList(
+    _Inout_ PD3DKMT_GET_PROCESS_LIST GetProcessList
+    );
+
+// rev
+/**
+ * The D3DKMT_ENUM_PROCESS_LIST structure is used for retrieving a list of process identifiers using a graphics adapter.
+ */
+typedef struct _D3DKMT_ENUM_PROCESS_LIST
+{
+    LUID AdapterLuid;          // [in] The locally unique identifier (LUID) for the graphics adapter.
+    PULONG ProcessIdBuffer;    // [out] A pointer to a buffer that receives the list of process identifiers (PIDs).
+    SIZE_T ProcessIdCount;     // [in, out] On input, specifies the number of elements the `ProcessIdBuffer` can hold. On output, receives the number of process IDs returned.
+} D3DKMT_ENUM_PROCESS_LIST, *PD3DKMT_ENUM_PROCESS_LIST;
+
+// rev
+/**
+ * The D3DKMTEnumProcesses function provides a list of process IDs (PIDs) rather than handles that are using a specific graphics adapter, 
+ * which can be more efficient for monitoring purposes.
+ *
+ * \param[in,out] EnumProcessList A pointer to a \ref D3DKMT_ENUM_PROCESS_LIST structure that contains the processes using the graphics adapter.
+ * \return NTSTATUS Successful or errant status.
+ */
+EXTERN_C
+NTSTATUS
+NTAPI
+D3DKMTEnumProcesses(
+    _Inout_ PD3DKMT_ENUM_PROCESS_LIST EnumProcessList
+    );
 
 #endif // _NTMISC_H

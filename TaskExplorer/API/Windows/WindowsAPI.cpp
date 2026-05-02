@@ -106,8 +106,9 @@ quint64 GetInstalledMemory()
 {
 	static BOOL (WINAPI *getPhysicallyInstalledSystemMemory)(PULONGLONG) = NULL;
 
+	static PH_STRINGREF kernel32_dll = PH_STRINGREF_INIT(L"kernel32.dll");
 	if (!getPhysicallyInstalledSystemMemory) 
-		getPhysicallyInstalledSystemMemory = (BOOL(WINAPI*)(PULONGLONG))PhGetDllProcedureAddress(L"kernel32.dll", "GetPhysicallyInstalledSystemMemory", 0);
+		getPhysicallyInstalledSystemMemory = (BOOL(WINAPI*)(PULONGLONG))PhGetDllProcedureAddress(&kernel32_dll, "GetPhysicallyInstalledSystemMemory", 0);
 
 	ULONGLONG InstalledMemory = 0;
     if (getPhysicallyInstalledSystemMemory && getPhysicallyInstalledSystemMemory(&InstalledMemory))

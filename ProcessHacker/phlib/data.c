@@ -6,7 +6,7 @@
  * Authors:
  *
  *     wj32    2010-2016
- *     dmex    2017-2023
+ *     dmex    2017-2026
  *
  */
 
@@ -153,6 +153,23 @@ PSID PhSeCloudActiveDirectorySid( // S-1-12-1 (dmex)
     return activeDirectorySid;
 }
 
+PSID PhSeLogonIdSid(
+    _In_ ULONG LogonId
+    )
+{
+    static UCHAR logonSessionSidBuffer[FIELD_OFFSET(SID, SubAuthority) + sizeof(ULONG[SECURITY_LOGON_IDS_RID_COUNT])];
+    static SID_IDENTIFIER_AUTHORITY authority = SECURITY_NT_AUTHORITY;
+    PSID logonSessionSid = (PSID)logonSessionSidBuffer;
+
+    PhInitializeSid(logonSessionSid, &authority, SECURITY_LOGON_IDS_RID_COUNT);
+    *PhSubAuthoritySid(logonSessionSid, 0) = SECURITY_LOGON_IDS_RID;
+    *PhSubAuthoritySid(logonSessionSid, 1) = 0;
+    *PhSubAuthoritySid(logonSessionSid, 2) = LogonId;
+
+    return logonSessionSid;
+}
+
+
 // Unicode
 
 DECLSPEC_SELECTANY CONST
@@ -204,8 +221,24 @@ BOOLEAN PhCharIsPrintableEx[256] =
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1  /* 240 - 255 */
 };
 
+/**
+ * Table mapping ASCII character codes to their corresponding integer values.
+ *
+ * This table is used for fast character-to-integer conversion, supporting:
+ * - Decimal digits ('0'-'9') mapped to 0-9
+ * - Uppercase letters ('A'-'Z') and lowercase letters ('a'-'z') mapped to 10-35
+ * - Common printable symbols mapped to 36-68
+ * - All other values are set to -1 (invalid)
+ *
+ * Example usage:
+ *   LONG value = PhCharToInteger['A']; // value == 10
+ *
+ * \note
+ *  - Indices 0-255 correspond to all possible unsigned char values.
+ *  - Non-mapped characters (including control codes) return -1.
+ */
 DECLSPEC_SELECTANY CONST
-ULONG PhCharToInteger[256] =
+LONG PhCharToInteger[256] =
 {
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0 - 15 */
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 16 - 31 */
@@ -348,7 +381,7 @@ CHAR PhIntegerToCharUpper[69] =
     ":;<=>?@" /* 52 - 58 */
     "[\\]^_`" /* 59 - 64 */
     "{|}~" /* 65 - 68 */
-    ;
+   ;
 
 // CRC32 (IEEE 802.3)
 

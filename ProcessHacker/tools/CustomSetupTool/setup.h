@@ -15,6 +15,7 @@
 #include <ph.h>
 #include <guisup.h>
 #include <prsht.h>
+#include <settings.h>
 #include <svcsup.h>
 #include <json.h>
 #include <mapldr.h>
@@ -185,6 +186,19 @@ VOID SetupCreateWindowsOptions(
 VOID SetupDeleteWindowsOptions(
     _In_ PPH_SETUP_CONTEXT Context
     );
+BOOLEAN SetupHasTaskMgrDebuggerIfeo(
+    VOID
+    );
+NTSTATUS SetupCreateTaskMgrDebuggerIfeo(
+    _In_ PPH_SETUP_CONTEXT Context
+    );
+
+NTSTATUS SetupCreateLocalDumpsKey(
+    VOID
+    );
+VOID SetupDeleteLocalDumpsKey(
+    VOID
+    );
 
 VOID SetupCreateShortcuts(
     _In_ PPH_SETUP_CONTEXT Context
@@ -204,9 +218,10 @@ NTSTATUS SetupExecuteApplication(
     _In_ PPH_SETUP_CONTEXT Context
     );
 
-VOID SetupUpgradeSettingsFile(
+NTSTATUS SetupUpgradeSettingsFile(
     VOID
     );
+
 NTSTATUS SetupConvertSettingsFile(
     VOID
     );
@@ -222,7 +237,7 @@ typedef struct _SETUP_REMOVE_FILE
     PWSTR FileName;
 } SETUP_REMOVE_FILE, *PSETUP_REMOVE_FILE;
 
-VOID SetupCreateLink(
+HRESULT SetupCreateLink(
     _In_ PCWSTR LinkFilePath,
     _In_ PCWSTR FilePath,
     _In_ PCWSTR FileParentDir,
@@ -241,7 +256,7 @@ PPH_STRING GetApplicationInstallPath(
     VOID
     );
 
-BOOLEAN SetupLegacySetupInstalled(
+NTSTATUS SetupLegacySetupInstalled(
     VOID
     );
 
@@ -292,24 +307,28 @@ BOOLEAN UpdateDownloadUpdateData(
 
 // extract.c
 
+_Function_class_(USER_THREAD_START_ROUTINE)
 NTSTATUS CALLBACK SetupExtractBuild(
     _In_ PPH_SETUP_CONTEXT Context
     );
 
 // install.c
 
+_Function_class_(USER_THREAD_START_ROUTINE)
 NTSTATUS CALLBACK SetupProgressThread(
     _In_ PPH_SETUP_CONTEXT Context
     );
 
 // update.c
 
+_Function_class_(USER_THREAD_START_ROUTINE)
 NTSTATUS CALLBACK SetupUpdateBuild(
     _In_ PPH_SETUP_CONTEXT Context
     );
 
 // uninstall.c
 
+_Function_class_(USER_THREAD_START_ROUTINE)
 NTSTATUS CALLBACK SetupUninstallBuild(
     _In_ PPH_SETUP_CONTEXT Context
     );

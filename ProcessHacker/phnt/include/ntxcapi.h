@@ -27,9 +27,9 @@ RtlRaiseStatus(
 /**
  * Raises an exception in the calling thread.
  *
- * @param ExceptionRecord A pointer to an EXCEPTION_RECORD structure that contains the exception information. You must specify the ExceptionAddress and ExceptionCode members.
- * @return This function does not return a value.
- * @see https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-raiseexception
+ * \param ExceptionRecord A pointer to an EXCEPTION_RECORD structure that contains the exception information. You must specify the ExceptionAddress and ExceptionCode members.
+ * \return This function does not return a value.
+ * \see https://learn.microsoft.com/en-us/windows/win32/api/errhandlingapi/nf-errhandlingapi-raiseexception
  */
 NTSYSAPI
 VOID
@@ -59,6 +59,7 @@ RtlRaiseNoncontinuableException(
     );
 #endif // PHNT_VERSION >= PHNT_WINDOWS_10_20H1
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -87,6 +88,7 @@ typedef struct _KCONTINUE_ARGUMENT
 #define KCONTINUE_FLAG_TEST_ALERT 0x00000001 // wbenny
 #define KCONTINUE_FLAG_DELIVER_APC 0x00000002 // wbenny
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -106,6 +108,7 @@ NtContinueEx(
 //}
 #endif // PHNT_VERSION >= PHNT_WINDOWS_10
 
+_Kernel_entry_
 NTSYSCALLAPI
 NTSTATUS
 NTAPI
@@ -127,4 +130,4 @@ RtlAssert(
     _In_opt_ PCSTR MutableMessage
     );
 
-#endif
+#endif // _NTXCAPI_H

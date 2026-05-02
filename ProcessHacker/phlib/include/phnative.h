@@ -34,6 +34,12 @@ EXTERN_C_START
 #define PhNtDevicePathPrefix ((PH_STRINGREF)PH_STRINGREF_INIT(L"\\Device\\"))
 #define PhWin32ExtendedPathPrefix ((PH_STRINGREF)PH_STRINGREF_INIT(L"\\\\?\\")) // extended-length paths, disable path normalization
 
+/**
+ * Checks if a handle is NULL or invalid.
+ *
+ * \param Handle The handle to check.
+ * \return TRUE if the handle is NULL or INVALID_HANDLE_VALUE, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 PhIsNullOrInvalidHandle(
@@ -57,7 +63,7 @@ typedef PH_OPEN_OBJECT* PPH_OPEN_OBJECT;
 
 typedef _Function_class_(PH_CLOSE_OBJECT)
 NTSTATUS NTAPI PH_CLOSE_OBJECT(
-    _In_ HANDLE Handle,
+    _In_opt_ HANDLE Handle,
     _In_ BOOLEAN Release,
     _In_opt_ PVOID Context
     );
@@ -119,6 +125,22 @@ PhOpenProcess(
     _In_ HANDLE ProcessId
     );
 
+/**
+ * Opens a process handle with the best available query access.
+ *
+ * The function tries the following access combinations in order:
+ *   1. PROCESS_QUERY_INFORMATION | DesiredAccess
+ *   2. PROCESS_QUERY_LIMITED_INFORMATION | DesiredAccess
+ *   3. PROCESS_QUERY_LIMITED_INFORMATION
+ *
+ * The first successful attempt is returned to the caller. If all attempts
+ * fail, the final NTSTATUS code is returned.
+ *
+ * \param ProcessHandle Receives the resulting process handle on success.
+ * \param DesiredAccess Additional access rights the caller wishes to request.
+ * \param ProcessId The process identifier of the target process.
+ * \return NTSTATUS Successful or errant status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -209,6 +231,191 @@ PhOpenThreadProcess(
     _In_ HANDLE ThreadHandle,
     _In_ ACCESS_MASK DesiredAccess,
     _Out_ PHANDLE ProcessHandle
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadBasicInformation(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PTHREAD_BASIC_INFORMATION BasicInformation
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadBasePriority(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PKPRIORITY Increment
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadTeb(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PULONG_PTR TebBaseAddress
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadTeb32(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PULONG_PTR TebBaseAddress
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadStartAddress(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PULONG_PTR StartAddress
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadIoPriority(
+    _In_ HANDLE ThreadHandle,
+    _Out_ IO_PRIORITY_HINT* IoPriority
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadPagePriority(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PULONG PagePriority
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadPriorityBoost(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PBOOLEAN PriorityBoostDisabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadPerformanceCounter(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PLARGE_INTEGER PerformanceCounter
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadCycleTime(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PULONG64 CycleTime
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadIdealProcessor(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PPROCESSOR_NUMBER ProcessorNumber
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadSuspendCount(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PULONG SuspendCount
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadWow64Context(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PWOW64_CONTEXT Context
+    );
+
+#if defined(_ARM64_)
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadArm32Context(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PARM_NT_CONTEXT Context
+    );
+#endif
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadBreakOnTermination(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PBOOLEAN BreakOnTermination
+);
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhSetThreadBreakOnTermination(
+    _In_ HANDLE ThreadHandle,
+    _In_ BOOLEAN BreakOnTermination
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadContainerId(
+    _In_ HANDLE ThreadHandle,
+    _In_ PGUID ContainerId
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadIsIoPending(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PBOOLEAN IsIoPending
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadTimes(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PKERNEL_USER_TIMES Times
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadIsTerminated(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PBOOLEAN IsTerminated
+    );
+
+PHLIBAPI
+BOOLEAN
+NTAPI
+PhGetThreadIsTerminated2(
+    _In_ HANDLE ThreadHandle
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadGroupAffinity(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PGROUP_AFFINITY GroupAffinity
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadIndexInformation(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PTHREAD_INDEX_INFORMATION ThreadIndex
     );
 
 PHLIBAPI
@@ -323,6 +530,298 @@ PhTerminateThread(
     _In_ NTSTATUS ExitStatus
     );
 
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhSuspendThread(
+    _In_ HANDLE ThreadHandle,
+    _Out_opt_ PULONG PreviousSuspendCount
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhResumeThread(
+    _In_ HANDLE ThreadHandle,
+    _Out_opt_ PULONG PreviousSuspendCount
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessBasicInformation(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_BASIC_INFORMATION BasicInformation
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessExtendedBasicInformation(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_EXTENDED_BASIC_INFORMATION ExtendedBasicInformation
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessTimes(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PKERNEL_USER_TIMES Times
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessSessionId(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PULONG SessionId
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIsWow64(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN IsWow64Process
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessPeb32(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PVOID* Peb32
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessPeb(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PVOID* PebBaseAddress
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessDebugObject(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PHANDLE DebugObjectHandle
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessEnergyValues(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_EXTENDED_ENERGY_VALUES EnergyValues
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessErrorMode(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PULONG ErrorMode
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhSetProcessErrorMode(
+    _In_ HANDLE ProcessHandle,
+    _In_ ULONG ErrorMode
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessExecuteFlags(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PULONG ExecuteFlags
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIoPriority(
+    _In_ HANDLE ProcessHandle,
+    _Out_ IO_PRIORITY_HINT *IoPriority
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIoCounters(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PIO_COUNTERS IoCounters
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIoCountersEx(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PVM_COUNTERS_EX VmCounters
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIoCountersEx2(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PVM_COUNTERS_EX2 VmCounters
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessPagePriority(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PULONG PagePriority
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessPriorityBoost(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN PriorityBoostDisabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessCycleTime(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PULONG64 CycleTime
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessUptime(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_UPTIME_INFORMATION Uptime
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessConsoleHostProcessId(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PHANDLE ConsoleHostProcessId
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessConsoleHostProcess(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PHANDLE ConsoleHostProcessId,
+    _Out_opt_ PBOOLEAN ConsoleApplication
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessProtection(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPS_PROTECTION Protection
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessAffinityMask(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PKAFFINITY AffinityMask
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessGroupInformation(
+    _In_ HANDLE ProcessHandle,
+    _Inout_ PUSHORT GroupCount,
+    _Out_ PUSHORT GroupArray
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessGroupAffinity(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PGROUP_AFFINITY GroupAffinity
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIsCFGuardEnabled(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN IsControlFlowGuardEnabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIsXFGuardEnabled(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN IsXFGuardEnabled,
+    _Out_ PBOOLEAN IsXFGuardAuditEnabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessHandleCount(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_HANDLE_INFORMATION HandleInfo
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessBreakOnTermination(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN BreakOnTermination
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhSetProcessBreakOnTermination(
+    _In_ HANDLE ProcessHandle,
+    _In_ BOOLEAN BreakOnTermination
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessAppMemoryInformation(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_JOB_MEMORY_INFO JobMemoryInfo
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessMitigationPolicy(
+    _In_ HANDLE ProcessHandle,
+    _In_ PROCESS_MITIGATION_POLICY Policy,
+    _Out_ PPROCESS_MITIGATION_POLICY_INFORMATION MitigationPolicy
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessNetworkIoCounters(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_NETWORK_COUNTERS NetworkIoCounters
+    );
+
 typedef struct _PH_PROCESS_RUNTIME_LIBRARY
 {
     PH_STRINGREF NtdllFileName;
@@ -378,6 +877,22 @@ NTAPI
 PhGetProcessIsBeingDebugged(
     _In_ HANDLE ProcessHandle,
     _Out_ PBOOLEAN IsBeingDebugged
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIsTerminating(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN IsTerminated
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIsTerminated(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PBOOLEAN IsTerminated
     );
 
 PHLIBAPI
@@ -505,6 +1020,16 @@ PhQueryEnvironmentVariableStringRef(
     _Inout_opt_ PPH_STRINGREF Value
     );
 
+/**
+ * Queries an environment variable and returns its value in a buffer.
+ *
+ * \param Environment A pointer to the environment block.
+ * \param Name The name of the environment variable.
+ * \param Buffer A buffer to receive the value.
+ * \param BufferLength The size of the buffer in characters.
+ * \param ReturnLength A pointer to a variable that receives the length of the value.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -542,6 +1067,14 @@ PhQueryEnvironmentVariable(
     _Out_opt_ PPH_STRING* Value
     );
 
+/**
+ * Queries an environment variable and returns its value as a string object.
+ *
+ * \param Environment A pointer to the environment block.
+ * \param Name The name of the environment variable.
+ * \param Value A pointer to a variable that receives the string object.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -567,6 +1100,14 @@ PhSetEnvironmentVariable(
     _In_opt_ PCPH_STRINGREF Value
     );
 
+/**
+ * Sets an environment variable.
+ *
+ * \param Environment A pointer to the environment block.
+ * \param Name The name of the environment variable.
+ * \param Value The value to set. If NULL, the variable is deleted.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -595,6 +1136,15 @@ PhSetEnvironmentVariableZ(
         return PhSetEnvironmentVariable(Environment, &name, NULL);
     }
 }
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessMemoryBasicInformation(
+    _In_ HANDLE ProcessHandle,
+    _In_ PVOID BaseAddress,
+    _Out_ PMEMORY_BASIC_INFORMATION BasicInformation
+    );
 
 PHLIBAPI
 NTSTATUS
@@ -752,7 +1302,28 @@ PhSetHandleInformationRemote(
     _In_ HANDLE ProcessHandle,
     _In_ HANDLE RemoteHandle,
     _In_ ULONG Mask,
-    _In_ ULONG Flags
+    _In_ ULONG Flags,
+    _In_opt_ PLARGE_INTEGER Timeout
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhCreateJobObject(
+    _Out_ PHANDLE JobObject,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_opt_ PCPH_STRINGREF ObjectName
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhOpenJobObject(
+    _Out_ PHANDLE JobHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_ PCPH_STRINGREF ObjectName
     );
 
 PHLIBAPI
@@ -802,6 +1373,142 @@ PhQueryTokenVariableSize(
     _In_ HANDLE TokenHandle,
     _In_ TOKEN_INFORMATION_CLASS TokenInformationClass,
     _Out_ PVOID *Buffer
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenType(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_TYPE Type
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenSessionId(
+    _In_ HANDLE TokenHandle,
+    _Out_ PULONG SessionId
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenElevationType(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_ELEVATION_TYPE ElevationType
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenElevation(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN TokenIsElevated
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenStatistics(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_STATISTICS Statistics
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenSource(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_SOURCE Source
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenLinkedToken(
+    _In_ HANDLE TokenHandle,
+    _Out_ PHANDLE LinkedTokenHandle
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenIsRestricted(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN IsRestricted
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenIsVirtualizationAllowed(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN IsVirtualizationAllowed
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenIsVirtualizationEnabled(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN IsVirtualizationEnabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenUIAccess(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN IsUIAccessEnabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhSetTokenUIAccess(
+    _In_ HANDLE TokenHandle,
+    _In_ BOOLEAN IsUIAccessEnabled
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenIsSandBoxInert(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN IsSandBoxInert
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenMandatoryPolicy(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_MANDATORY_POLICY MandatoryPolicy
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenOrigin(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_ORIGIN Origin
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenIsAppContainer(
+    _In_ HANDLE TokenHandle,
+    _Out_ PBOOLEAN IsAppContainer
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenAppContainerNumber(
+    _In_ HANDLE TokenHandle,
+    _Out_ PULONG AppContainerNumber
     );
 
 // rev from SE_TOKEN_USER (dmex)
@@ -976,10 +1683,11 @@ PhGetTokenSecurityAttributeValueUlong64(
     );
 
 PHLIBAPI
-PPH_STRING
+NTSTATUS
 NTAPI
 PhGetTokenPackageFullName(
-    _In_ HANDLE TokenHandle
+    _In_ HANDLE TokenHandle,
+    _Out_ PPH_STRING* PackageFullName
     );
 
 PHLIBAPI
@@ -1005,6 +1713,14 @@ PhGetProcessPackageFullName(
     );
 
 // rev from RtlInitializeSid (dmex)
+/**
+ * Initializes a Security Identifier (SID).
+ *
+ * \param Sid A pointer to the SID to initialize.
+ * \param IdentifierAuthority The identifier authority to set.
+ * \param SubAuthorityCount The number of sub-authorities to set.
+ * \return TRUE if the SID was successfully initialized, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -1031,6 +1747,12 @@ PhInitializeSid(
 }
 
 // rev from RtlLengthSid (dmex)
+/**
+ * Gets the length of a SID.
+ *
+ * \param Sid The SID to measure.
+ * \return The length of the SID in bytes.
+ */
 FORCEINLINE
 ULONG
 NTAPI
@@ -1047,6 +1769,12 @@ PhLengthSid(
 }
 
 // rev from RtlLengthRequiredSid (dmex)
+/**
+ * Gets the length required to store a SID with a given number of sub-authorities.
+ *
+ * \param SubAuthorityCount The number of sub-authorities.
+ * \return The required length in bytes.
+ */
 FORCEINLINE
 ULONG
 NTAPI
@@ -1062,6 +1790,13 @@ PhLengthRequiredSid(
 }
 
 // rev from RtlEqualSid (dmex)
+/**
+ * Compares two SIDs for equality.
+ *
+ * \param Sid1 The first SID.
+ * \param Sid2 The second SID.
+ * \return TRUE if the SIDs are equal, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -1095,6 +1830,12 @@ PhEqualSid(
 }
 
 // rev from RtlValidSid (dmex)
+/**
+ * Validates a SID.
+ *
+ * \param Sid The SID to validate.
+ * \return TRUE if the SID is valid, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -1119,6 +1860,13 @@ PhValidSid(
 }
 
 // rev from RtlSubAuthoritySid (dmex)
+/**
+ * Gets a pointer to a sub-authority of a SID.
+ *
+ * \param Sid The SID.
+ * \param SubAuthority The index of the sub-authority.
+ * \return A pointer to the sub-authority.
+ */
 FORCEINLINE
 PULONG
 NTAPI
@@ -1135,6 +1883,12 @@ PhSubAuthoritySid(
 }
 
 // rev from RtlSubAuthorityCountSid (dmex)
+/**
+ * Gets the number of sub-authorities in a SID.
+ *
+ * \param Sid The SID.
+ * \return A pointer to the sub-authority count.
+ */
 FORCEINLINE
 PUCHAR
 NTAPI
@@ -1150,6 +1904,12 @@ PhSubAuthorityCountSid(
 }
 
 // rev from RtlIdentifierAuthoritySid (dmex)
+/**
+ * Gets the identifier authority of a SID.
+ *
+ * \param Sid The SID.
+ * \return A pointer to the identifier authority.
+ */
 FORCEINLINE
 PSID_IDENTIFIER_AUTHORITY
 NTAPI
@@ -1164,6 +1924,13 @@ PhIdentifierAuthoritySid(
 #endif
 }
 
+/**
+ * Compares two identifier authorities for equality.
+ *
+ * \param IdentifierAuthoritySid1 The first identifier authority.
+ * \param IdentifierAuthoritySid2 The second identifier authority.
+ * \return TRUE if the identifier authorities are equal, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -1180,6 +1947,13 @@ PhEqualIdentifierAuthoritySid(
 }
 
 // rev from RtlCreateSecurityDescriptor (dmex)
+/**
+ * Creates a new security descriptor.
+ *
+ * \param SecurityDescriptor A pointer to a buffer that receives the new security descriptor.
+ * \param Revision The revision level of the security descriptor.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1198,6 +1972,12 @@ PhCreateSecurityDescriptor(
 }
 
 // rev from RtlValidAcl (dmex)
+/**
+ * Validates an ACL.
+ *
+ * \param Acl The ACL to validate.
+ * \return TRUE if the ACL is valid, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -1213,6 +1993,67 @@ PhValidAcl(
     return RtlValidAcl(Acl);
 }
 
+/**
+ * Gets the required ACL revision for a given ACE type.
+ *
+ * \param AceType The ACE type.
+ * \return The required ACL revision.
+ */
+FORCEINLINE
+UCHAR
+NTAPI
+PhRequiredAclRevision(
+    _In_ UCHAR AceType
+    )
+{
+    switch (AceType)
+    {
+    case ACCESS_ALLOWED_OBJECT_ACE_TYPE:
+    case ACCESS_DENIED_OBJECT_ACE_TYPE:
+    case SYSTEM_AUDIT_OBJECT_ACE_TYPE:
+    case SYSTEM_ALARM_OBJECT_ACE_TYPE:
+    case ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE:
+    case ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE:
+    case SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE:
+    case SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE:
+        return ACL_REVISION4;
+
+    case ACCESS_ALLOWED_COMPOUND_ACE_TYPE:
+        return ACL_REVISION3;
+
+    default:
+        return MIN_ACL_REVISION;
+    }
+}
+
+/**
+ * Ensures that an ACL revision is at least the required revision for a given ACE type.
+ *
+ * \param AclRevision A pointer to the ACL revision.
+ * \param AceType The ACE type.
+ */
+FORCEINLINE
+VOID
+NTAPI
+PhEnsureAclRevision(
+    _Inout_ PULONG_PTR AclRevision,
+    _In_ UCHAR AceType
+    )
+{
+    UCHAR requiredRevision = PhRequiredAclRevision(AceType);
+
+    if (requiredRevision > *AclRevision)
+    {
+        *AclRevision = requiredRevision;
+    }
+}
+
+/**
+ * Gets a pointer to the first ACE in an ACL.
+ *
+ * \param Acl The ACL.
+ * \return A pointer to the first ACE.
+ */
 FORCEINLINE
 PVOID
 NTAPI
@@ -1223,6 +2064,12 @@ PhFirstAce(
     return RTL_PTR_ADD(Acl, sizeof(ACL));
 }
 
+/**
+ * Gets a pointer to the next ACE in an ACL.
+ *
+ * \param Ace The current ACE.
+ * \return A pointer to the next ACE, or NULL if the ACE size is invalid.
+ */
 FORCEINLINE
 PVOID
 NTAPI
@@ -1238,6 +2085,13 @@ PhNextAce(
     return RTL_PTR_ADD(Ace, ace->AceSize);
 }
 
+/**
+ * Gets a pointer to the first free byte in an ACL.
+ *
+ * \param Acl The ACL.
+ * \param FirstFree A pointer to a variable that receives the pointer to the first free byte.
+ * \return TRUE if successful, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -1284,6 +2138,14 @@ InvalidAcl:
 #endif
 }
 
+/**
+ * Gets a pointer to an ACE in an ACL.
+ *
+ * \param Acl The ACL.
+ * \param AceIndex The index of the ACE.
+ * \param Ace A pointer to a variable that receives the pointer to the ACE.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1296,8 +2158,8 @@ PhGetAce(
 #if defined(PHNT_NATIVE_INLINE)
     return RtlGetAce(Acl, AceIndex, Ace);
 #else
-    PVOID current;
-    PVOID lastace;
+    PUCHAR current;
+    PUCHAR lastace;
 
     if (Acl->AclRevision < MIN_ACL_REVISION ||
         Acl->AclRevision > MAX_ACL_REVISION ||
@@ -1306,18 +2168,18 @@ PhGetAce(
         return STATUS_INVALID_ACL;
     }
 
-    current = PhFirstAce(Acl);
-    lastace = RTL_PTR_ADD(Acl, Acl->AclSize);
+    current = (PUCHAR)PhFirstAce(Acl);
+    lastace = (PUCHAR)RTL_PTR_ADD(Acl, Acl->AclSize);
 
     for (ULONG i = 0; i < AceIndex; i++)
     {
         if ((ULONG_PTR)current >= (ULONG_PTR)lastace)
             return STATUS_INVALID_ACL;
 
-        current = PhNextAce((PACL)current);
+        current = (PUCHAR)PhNextAce((PACL)current);
     }
 
-    if (current >= lastace)
+    if ((ULONG_PTR)current >= (ULONG_PTR)lastace)
         return STATUS_INVALID_ACL;
 
     *Ace = current;
@@ -1325,6 +2187,135 @@ PhGetAce(
 #endif
 }
 
+/**
+ * Adds one or more Access Control Entries (ACEs) to an Access Control List (ACL).
+ *
+ * \param Acl A pointer to an ACL structure.
+ * \param AceRevision The revision level of the ACEs being added.
+ * \param StartingAceIndex The zero-based index at which to add the new ACEs.
+ * \param AceList A pointer to a buffer containing the list of ACEs to be added.
+ * \param AceListLength The size of the ACE list in bytes.
+ * \return NTSTATUS Successful or error status.
+ */
+FORCEINLINE
+NTSTATUS
+NTAPI
+PhAddAce(
+    _Inout_ PACL Acl,
+    _In_ ULONG AceRevision,
+    _In_ ULONG StartingAceIndex,
+    _In_reads_bytes_(AceListLength) PVOID AceList,
+    _In_ ULONG AceListLength
+    )
+{
+    PVOID firstFreeAce;
+    PVOID insertionPoint;
+    ULONG currentAceCount;
+    ULONG_PTR targetAclRevision;
+    ULONG_PTR sourceAceAddress;
+    ULONG_PTR sourceAceEndAddress;
+    ULONG_PTR aclEndAddress;
+    USHORT incomingAceCount;
+    SIZE_T trailingAceBytes;
+
+    if (!PhValidAcl(Acl))
+        return STATUS_INVALID_PARAMETER;
+    if (AceListLength == 0)
+        return STATUS_SUCCESS;
+
+    if (!PhFirstFreeAce(Acl, &firstFreeAce) || !firstFreeAce)
+        return STATUS_INVALID_ACL;
+
+    currentAceCount = Acl->AceCount;
+
+    // Reject out-of-bounds index.
+    // Win32 AddAce allows index == currentAceCount to append at the end.
+    if (StartingAceIndex > currentAceCount)
+        return STATUS_INVALID_PARAMETER;
+
+    // Determine target ACL revision
+    targetAclRevision = (ULONG_PTR)Acl->AclRevision;
+
+    if ((ULONG_PTR)AceRevision > targetAclRevision)
+        targetAclRevision = (ULONG_PTR)AceRevision;
+
+    // Validate incoming ACE list
+    sourceAceAddress = (ULONG_PTR)AceList;
+    sourceAceEndAddress = sourceAceAddress + AceListLength;
+    incomingAceCount = 0;
+
+    while (sourceAceAddress < sourceAceEndAddress)
+    {
+        PACE_HEADER aceHeader;
+        USHORT aceSize;
+
+        if (sourceAceAddress + sizeof(ACE_HEADER) > sourceAceEndAddress)
+            return STATUS_INVALID_PARAMETER;
+
+        aceHeader = (PACE_HEADER)sourceAceAddress;
+        aceSize = aceHeader->AceSize;
+
+        // ACEs must be at least the size of the header and 
+        // effectively DWORD aligned in practice for NT.
+        if (aceSize < sizeof(ACE_HEADER) || sourceAceAddress + aceSize > sourceAceEndAddress)
+            return STATUS_INVALID_PARAMETER;
+
+        PhEnsureAclRevision(&targetAclRevision, aceHeader->AceType);
+
+        sourceAceAddress += aceSize;
+        incomingAceCount++;
+    }
+
+    if (sourceAceAddress != sourceAceEndAddress)
+        return STATUS_INVALID_PARAMETER;
+
+    // Check for USHORT overflow on AceCount
+    if (currentAceCount + incomingAceCount > MAXUSHORT)
+        return STATUS_INVALID_PARAMETER;
+
+    // Determine insertion point
+    insertionPoint = firstFreeAce;
+
+    if (StartingAceIndex < currentAceCount)
+    {
+        NTSTATUS status = PhGetAce(Acl, StartingAceIndex, &insertionPoint);
+
+        if (!NT_SUCCESS(status))
+            return status;
+    }
+
+    // Capacity check
+    aclEndAddress = (ULONG_PTR)Acl + Acl->AclSize;
+
+    // Overflow-safe check: Is (firstFreeAce + AceListLength) > aclEndAddress?
+    if (AceListLength > (SIZE_T)((ULONG_PTR)aclEndAddress - (ULONG_PTR)firstFreeAce))
+        return STATUS_BUFFER_TOO_SMALL;
+
+    // Shift and Copy
+    trailingAceBytes = (SIZE_T)((ULONG_PTR)firstFreeAce - (ULONG_PTR)insertionPoint);
+
+    if (trailingAceBytes > 0)
+    {
+        RtlMoveMemory(PTR_ADD_OFFSET(insertionPoint, AceListLength), insertionPoint, trailingAceBytes);
+    }
+
+    RtlCopyMemory(insertionPoint, AceList, AceListLength);
+
+    // Finalize
+    Acl->AceCount = (USHORT)(currentAceCount + incomingAceCount);
+    Acl->AclRevision = (UCHAR)targetAclRevision;
+
+    return STATUS_SUCCESS;
+}
+
+/**
+ * Creates an ACL.
+ *
+ * \param Acl A pointer to a buffer that receives the new ACL.
+ * \param Length The size of the ACL buffer.
+ * \param Revision The revision level of the ACL.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1351,6 +2342,15 @@ PhCreateAcl(
 #endif
 }
 
+/**
+ * Gets the DACL from a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param DaclPresent Receives TRUE if a DACL is present, FALSE otherwise.
+ * \param Dacl Receives a pointer to the DACL.
+ * \param DaclDefaulted Receives TRUE if the DACL was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1398,6 +2398,15 @@ PhGetDaclSecurityDescriptor(
 #endif
 }
 
+/**
+ * Sets the DACL of a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param DaclPresent TRUE if a DACL is present, FALSE otherwise.
+ * \param Dacl A pointer to the DACL.
+ * \param DaclDefaulted TRUE if the DACL was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1431,6 +2440,15 @@ PhSetDaclSecurityDescriptor(
 #endif
 }
 
+/**
+ * Gets the DACL from a security descriptor, ensuring it is not NULL.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param DaclPresent Receives TRUE if a DACL is present, FALSE otherwise.
+ * \param DaclDefaulted Receives TRUE if the DACL was defaulted, FALSE otherwise.
+ * \param Dacl Receives a pointer to the DACL.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1470,6 +2488,15 @@ PhGetDaclSecurityDescriptorNotNull(
     return status;
 }
 
+/**
+ * Gets the SACL from a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param SaclPresent Receives TRUE if a SACL is present, FALSE otherwise.
+ * \param Sacl Receives a pointer to the SACL.
+ * \param SaclDefaulted Receives TRUE if the SACL was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1517,6 +2544,15 @@ PhGetSaclSecurityDescriptor(
 #endif
 }
 
+/**
+ * Sets the SACL of a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param SaclPresent TRUE if a SACL is present, FALSE otherwise.
+ * \param Sacl A pointer to the SACL.
+ * \param SaclDefaulted TRUE if the SACL was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1550,6 +2586,14 @@ PhSetSaclSecurityDescriptor(
 #endif
 }
 
+/**
+ * Gets the owner from a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param Owner Receives a pointer to the owner SID.
+ * \param OwnerDefaulted Receives TRUE if the owner was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1592,6 +2636,14 @@ PhGetOwnerSecurityDescriptor(
 #endif
 }
 
+/**
+ * Sets the owner of a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param Owner A pointer to the owner SID.
+ * \param OwnerDefaulted TRUE if the owner was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1625,6 +2677,14 @@ PhSetOwnerSecurityDescriptor(
 #endif
 }
 
+/**
+ * Gets the group from a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param Group Receives a pointer to the group SID.
+ * \param GroupDefaulted Receives TRUE if the group was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1667,6 +2727,14 @@ PhGetGroupSecurityDescriptor(
 #endif
 }
 
+/**
+ * Sets the group of a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param Group A pointer to the group SID.
+ * \param GroupDefaulted TRUE if the group was defaulted, FALSE otherwise.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1700,6 +2768,14 @@ PhSetGroupSecurityDescriptor(
 #endif
 }
 
+/**
+ * Gets the control and revision information from a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param Control Receives the control information.
+ * \param Revision Receives the revision level.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1728,6 +2804,14 @@ PhGetControlSecurityDescriptor(
 #endif
 }
 
+/**
+ * Sets the control bits of a security descriptor.
+ *
+ * \param SecurityDescriptor The security descriptor.
+ * \param ControlBitsOfInterest The control bits to be set or cleared.
+ * \param ControlBitsToSet The control bits to set.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1756,47 +2840,16 @@ PhSetControlSecurityDescriptor(
 #endif
 }
 
-FORCEINLINE
-UCHAR
-NTAPI
-PhRequiredAclRevision(
-    _In_ UCHAR AceType
-    )
-{
-    switch (AceType)
-    {
-    case ACCESS_ALLOWED_OBJECT_ACE_TYPE:
-    case ACCESS_DENIED_OBJECT_ACE_TYPE:
-    case SYSTEM_AUDIT_OBJECT_ACE_TYPE:
-    case SYSTEM_ALARM_OBJECT_ACE_TYPE:
-    case ACCESS_ALLOWED_CALLBACK_OBJECT_ACE_TYPE:
-    case ACCESS_DENIED_CALLBACK_OBJECT_ACE_TYPE:
-    case SYSTEM_AUDIT_CALLBACK_OBJECT_ACE_TYPE:
-    case SYSTEM_ALARM_CALLBACK_OBJECT_ACE_TYPE:
-        return ACL_REVISION4;
-
-    case ACCESS_ALLOWED_COMPOUND_ACE_TYPE:
-        return ACL_REVISION3;
-
-    default:
-        return ACL_REVISION2;
-    }
-}
-
-FORCEINLINE
-VOID
-NTAPI
-PhEnsureAclRevision(
-    _Inout_ PUCHAR AclRevision,
-    _In_ UCHAR AceType
-    )
-{
-    UCHAR requiredRevision = PhRequiredAclRevision(AceType);
-
-    if (requiredRevision > *AclRevision)
-        *AclRevision = requiredRevision;
-}
-
+/**
+ * Adds an access-allowed ACE with flags to an ACL.
+ *
+ * \param Acl The ACL.
+ * \param AceRevision The revision level.
+ * \param AceFlags The ACE flags.
+ * \param AccessMask The access mask.
+ * \param Sid The SID.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1845,6 +2898,15 @@ PhAddAccessAllowedAceEx(
 #endif
 }
 
+/**
+ * Adds an access-allowed ACE to an ACL.
+ *
+ * \param Acl The ACL.
+ * \param AceRevision The revision level.
+ * \param AccessMask The access mask.
+ * \param Sid The SID.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1858,6 +2920,11 @@ PhAddAccessAllowedAce(
     return PhAddAccessAllowedAceEx(Acl, AceRevision, 0, AccessMask, Sid);
 }
 
+/**
+ * Acquires the PEB lock.
+ *
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1872,6 +2939,11 @@ PhAcquirePebLock(
 #endif
 }
 
+/**
+ * Releases the PEB lock.
+ *
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1886,6 +2958,11 @@ PhReleasePebLock(
 #endif
 }
 
+/**
+ * Acquires the loader lock.
+ *
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1896,6 +2973,11 @@ PhAcquireLoaderLock(
     return RtlEnterCriticalSection(NtCurrentPeb()->LoaderLock);
 }
 
+/**
+ * Releases the loader lock.
+ *
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -1906,6 +2988,11 @@ PhReleaseLoaderLock(
     return RtlLeaveCriticalSection(NtCurrentPeb()->LoaderLock);
 }
 
+/**
+ * Gets the primary group of the current thread.
+ *
+ * \return The primary group RID.
+ */
 FORCEINLINE
 USHORT
 NTAPI
@@ -1920,6 +3007,11 @@ PhGetCurrentThreadPrimaryGroup(
 #endif
 }
 
+/**
+ * Gets the session ID of the current service session.
+ *
+ * \return The session ID.
+ */
 FORCEINLINE
 ULONG
 NTAPI
@@ -1937,6 +3029,11 @@ PhGetCurrentServiceSessionId(
 #endif
 }
 
+/**
+ * Gets the active console session ID.
+ *
+ * \return The active console session ID.
+ */
 FORCEINLINE
 ULONG
 NTAPI
@@ -1954,6 +3051,11 @@ PhGetActiveConsoleId(
 #endif
 }
 
+/**
+ * Gets the process ID of the foreground process in the console session.
+ *
+ * \return The process ID.
+ */
 FORCEINLINE
 LONGLONG
 NTAPI
@@ -1971,6 +3073,11 @@ PhGetConsoleSessionForegroundProcessId(
 #endif
 }
 
+/**
+ * Gets the NT system root path.
+ *
+ * \return The NT system root path.
+ */
 FORCEINLINE
 PWSTR
 NTAPI
@@ -1988,6 +3095,11 @@ PhRtlGetNtSystemRoot(
 #endif
 }
 
+/**
+ * Checks if long paths are enabled.
+ *
+ * \return TRUE if long paths are enabled, FALSE otherwise.
+ */
 FORCEINLINE
 BOOLEAN
 NTAPI
@@ -2002,6 +3114,11 @@ PhAreLongPathsEnabled(
 //#endif
 }
 
+/**
+ * Frees a Unicode string.
+ *
+ * \param UnicodeString The Unicode string to free.
+ */
 FORCEINLINE
 VOID
 NTAPI
@@ -2020,6 +3137,11 @@ PhFreeUnicodeString(
 #endif
 }
 
+/**
+ * Frees an ANSI string.
+ *
+ * \param AnsiString The ANSI string to free.
+ */
 FORCEINLINE
 VOID
 NTAPI
@@ -2038,6 +3160,11 @@ PhFreeAnsiString(
 #endif
 }
 
+/**
+ * Frees a UTF-8 string.
+ *
+ * \param Utf8String The UTF-8 string to free.
+ */
 FORCEINLINE
 VOID
 NTAPI
@@ -2056,6 +3183,12 @@ PhFreeUTF8String(
 #endif
 }
 
+/**
+ * Frees a SID.
+ *
+ * \param Sid The SID to free.
+ * \return NULL.
+ */
 FORCEINLINE
 PVOID
 NTAPI
@@ -2071,19 +3204,19 @@ PhFreeSid(
 #endif
 }
 
-FORCEINLINE
-VOID
-NTAPI
-PhDeleteBoundaryDescriptor(
-    _In_ _Post_invalid_ POBJECT_BOUNDARY_DESCRIPTOR BoundaryDescriptor
-    )
-{
-#if defined(PHNT_NATIVE_INLINE)
-    RtlDeleteBoundaryDescriptor(BoundaryDescriptor);
-#else
-    RtlFreeHeap(RtlProcessHeap(), 0, BoundaryDescriptor);
-#endif
-}
+//FORCEINLINE
+//VOID
+//NTAPI
+//PhDeleteBoundaryDescriptor(
+//    _In_ _Post_invalid_ POBJECT_BOUNDARY_DESCRIPTOR BoundaryDescriptor
+//    )
+//{
+//#if defined(PHNT_NATIVE_INLINE)
+//    RtlDeleteBoundaryDescriptor(BoundaryDescriptor);
+//#else
+//    RtlFreeHeap(RtlProcessHeap(), 0, BoundaryDescriptor);
+//#endif
+//}
 
 //#define RtlDeleteSecurityObject(ObjectDescriptor) RtlFreeHeap(RtlProcessHeap(), 0, *(ObjectDescriptor))
 //FORCEINLINE
@@ -2096,6 +3229,12 @@ PhDeleteBoundaryDescriptor(
 //    return STATUS_SUCCESS;
 //}
 
+/**
+ * Destroys an environment block.
+ *
+ * \param Environment The environment block to destroy.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -2111,6 +3250,12 @@ PhDestroyEnvironment(
 #endif
 }
 
+/**
+ * Destroys process parameters.
+ *
+ * \param ProcessParameters The process parameters to destroy.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -2143,7 +3288,7 @@ PhDestroyProcessParameters(
 //#define RtlFreeSid(Sid) RtlFreeHeap(RtlProcessHeap(), 0, (Sid))
 #define RtlFreeSid PhFreeSid
 //#define RtlDeleteBoundaryDescriptor(BoundaryDescriptor) RtlFreeHeap(RtlProcessHeap(), 0, (BoundaryDescriptor))
-#define RtlDeleteBoundaryDescriptor PhDeleteBoundaryDescriptor
+//#define RtlDeleteBoundaryDescriptor PhDeleteBoundaryDescriptor
 //#define RtlDestroyEnvironment(Environment) RtlFreeHeap(RtlProcessHeap(), 0, (Environment))
 #define RtlDestroyEnvironment PhDestroyEnvironment
 //#define RtlDestroyProcessParameters(ProcessParameters) RtlFreeHeap(RtlProcessHeap(), 0, (ProcessParameters))
@@ -2842,7 +3987,7 @@ NTAPI
 PhOpenSection(
     _Out_ PHANDLE SectionHandle,
     _In_ ACCESS_MASK DesiredAccess,
-    _In_ HANDLE RootDirectory,
+    _In_opt_ HANDLE RootDirectory,
     _In_ PCPH_STRINGREF SectionName
     );
 
@@ -2930,7 +4075,6 @@ PhGetSecureKernelFileName(
  * Gets a pointer to the process information structure after a given structure.
  *
  * \param Process A pointer to a process information structure.
- *
  * \return A pointer to the next process information structure, or NULL if there are no more.
  */
 #define PH_NEXT_PROCESS(Process) ( \
@@ -2969,6 +4113,47 @@ NTAPI
 PhEnumProcessesEx(
     _Out_ PVOID *Processes,
     _In_ SYSTEM_INFORMATION_CLASS SystemInformationClass
+    );
+
+/**
+ * Gets a pointer to the first basic process information structure in a buffer returned by
+ * PhEnumBasicProcessInformation().
+ * \param Processes A pointer to a buffer returned by PhEnumBasicProcessInformation().
+ */
+#define PH_FIRST_BASIC_PROCESS(Processes) ((PSYSTEM_BASICPROCESS_INFORMATION)(Processes))
+
+/**
+ * Gets a pointer to the basic process information structure after a given structure.
+ * \param Process A pointer to a basic process information structure.
+ * \return A pointer to the next basic process information structure, or NULL if there are no more.
+ */
+#define PH_NEXT_BASIC_PROCESS(Process) ( \
+    ((PSYSTEM_BASICPROCESS_INFORMATION)(Process))->NextEntryOffset ? \
+    (PSYSTEM_BASICPROCESS_INFORMATION)PTR_ADD_OFFSET((Process), \
+    ((PSYSTEM_BASICPROCESS_INFORMATION)(Process))->NextEntryOffset) : \
+    NULL \
+    )
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhEnumBasicProcessInformation(
+    _Inout_ PVOID *Buffer,
+    _Inout_ PULONG BufferSize
+    );
+
+typedef _Function_class_(PH_ENUM_PROCESS_THREADS)
+NTSTATUS NTAPI PH_ENUM_PROCESS_THREADS(
+    _In_ ULONG NumberOfThreads,
+    _In_ PSYSTEM_THREAD_INFORMATION Threads,
+    _In_opt_ PVOID Context
+    );
+typedef PH_ENUM_PROCESS_THREADS* PPH_ENUM_PROCESS_THREADS;
+
+NTSTATUS PhEnumProcessThreads(
+    _In_ HANDLE ProcessId,
+    _In_ PPH_ENUM_PROCESS_THREADS Callback,
+    _In_opt_ PVOID Context
     );
 
 typedef _Function_class_(PH_ENUM_NEXT_PROCESS)
@@ -3116,6 +4301,16 @@ PhEnumBigPoolInformation(
     _Out_ PVOID* Buffer
     );
 
+_Must_inspect_result_
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetProcessIsContainer(
+    _In_ HANDLE ProcessId,
+    _In_opt_ HANDLE ProcessHandle,
+    _Out_opt_ PBOOLEAN IsContainer
+    );
+
 PHLIBAPI
 NTSTATUS
 NTAPI
@@ -3160,6 +4355,85 @@ PhOpenDirectoryObject(
     _In_ PCPH_STRINGREF ObjectName
     );
 
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhCreateDirectoryObject(
+    _Out_ PHANDLE DirectoryHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_opt_ PCPH_STRINGREF ObjectName
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhCreatePrivateNamespace(
+    _Out_ PHANDLE NamespaceHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_opt_ PCPH_STRINGREF ObjectName,
+    _In_ POBJECT_BOUNDARY_DESCRIPTOR BoundaryDescriptor
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhOpenPrivateNamespace(
+    _Out_ PHANDLE NamespaceHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_opt_ PCPH_STRINGREF ObjectName,
+    _In_ POBJECT_BOUNDARY_DESCRIPTOR BoundaryDescriptor
+    );
+
+PHLIBAPI
+POBJECT_BOUNDARY_DESCRIPTOR
+NTAPI
+PhCreateBoundaryDescriptor(
+    _In_ PCPH_STRINGREF Name,
+    _In_ ULONG Flags
+    );
+
+PHLIBAPI
+VOID
+NTAPI
+PhDeleteBoundaryDescriptor(
+    _In_ _Post_invalid_ POBJECT_BOUNDARY_DESCRIPTOR BoundaryDescriptor
+    );
+
+typedef _Function_class_(OBJECT_BOUNDARY_ENUM_PROCEDURE)
+BOOLEAN NTAPI OBJECT_BOUNDARY_ENUM_PROCEDURE(
+    _In_ POBJECT_BOUNDARY_ENTRY Entry,
+    _In_opt_ PVOID Context
+    );
+typedef OBJECT_BOUNDARY_ENUM_PROCEDURE* POBJECT_BOUNDARY_ENUM_PROCEDURE;
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhEnumerateBoundaryDescriptorEntries(
+    _In_ POBJECT_BOUNDARY_DESCRIPTOR BoundaryDescriptor,
+    _In_opt_ POBJECT_BOUNDARY_ENUM_PROCEDURE Callback,
+    _In_opt_ PVOID Context
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhAddSIDToBoundaryDescriptor(
+    _Inout_ POBJECT_BOUNDARY_DESCRIPTOR* BoundaryDescriptor,
+    _In_ PCSID RequiredSid
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhAddIntegrityLabelToBoundaryDescriptor(
+    _Inout_ POBJECT_BOUNDARY_DESCRIPTOR* BoundaryDescriptor,
+    _In_ PCSID IntegrityLabel
+    );
+
 /**
  * A callback function passed to PhEnumDirectoryObjects() and called for each directory object.
  *
@@ -3167,7 +4441,6 @@ PhOpenDirectoryObject(
  * \param Name The name of the object.
  * \param TypeName The name of the object's type.
  * \param Context A user-defined value passed to PhEnumDirectoryObjects().
- *
  * \return TRUE to continue the enumeration, FALSE to stop.
  */
 typedef _Function_class_(PH_ENUM_DIRECTORY_OBJECTS)
@@ -3206,6 +4479,15 @@ PhEnumDirectoryFile(
     _In_opt_ PVOID Context
     );
 
+/**
+ * Enumerates files in a directory.
+ *
+ * \param FileHandle A handle to the directory.
+ * \param SearchPattern An optional search pattern.
+ * \param Callback A callback function called for each file.
+ * \param Context A user-defined value passed to the callback.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3240,6 +4522,17 @@ PhEnumDirectoryFileEx(
     _In_opt_ PVOID Context
     );
 
+/**
+ * Enumerates files in a directory with extended options.
+ *
+ * \param FileHandle A handle to the directory.
+ * \param FileInformationClass The type of information to return.
+ * \param ReturnSingleEntry Whether to return only a single entry.
+ * \param SearchPattern An optional search pattern.
+ * \param Callback A callback function called for each file.
+ * \param Context A user-defined value passed to the callback.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3384,6 +4677,14 @@ PhQuerySymbolicLinkObject(
     _In_ PCPH_STRINGREF ObjectName
     );
 
+/**
+ * Queries the target of a symbolic link object.
+ *
+ * \param LinkTarget Receives the target path.
+ * \param RootDirectory An optional root directory handle.
+ * \param ObjectName The name of the symbolic link object.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3538,7 +4839,6 @@ typedef struct _PH_MODULE_INFO
  *
  * \param Module A structure providing information about the module.
  * \param Context A user-defined value passed to PhEnumGenericModules().
- *
  * \return TRUE to continue the enumeration, FALSE to stop.
  */
 typedef _Function_class_(PH_ENUM_GENERIC_MODULES_CALLBACK)
@@ -3586,6 +4886,18 @@ PhCreateKey(
     _Out_opt_ PULONG Disposition
     );
 
+/**
+ * Creates or opens a registry key.
+ *
+ * \param KeyHandle Receives the key handle.
+ * \param DesiredAccess The desired access rights.
+ * \param RootDirectory An optional root directory handle.
+ * \param ObjectName The name of the key.
+ * \param Attributes Object attributes.
+ * \param CreateOptions Options for creating the key.
+ * \param Disposition Receives the disposition (created or opened).
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3617,6 +4929,16 @@ PhOpenKey(
     _In_ ULONG Attributes
     );
 
+/**
+ * Opens a registry key.
+ *
+ * \param KeyHandle Receives the key handle.
+ * \param DesiredAccess The desired access rights.
+ * \param RootDirectory An optional root directory handle.
+ * \param ObjectName The name of the key.
+ * \param Attributes Object attributes.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3680,6 +5002,15 @@ PhQueryValueKey(
     _Out_ PVOID *Buffer
     );
 
+/**
+ * Queries a registry value.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to query.
+ * \param KeyValueInformationClass The type of information to return.
+ * \param Buffer Receives a pointer to the value information.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3713,6 +5044,16 @@ PhSetValueKey(
     _In_ ULONG BufferLength
     );
 
+/**
+ * Sets a registry value.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to set.
+ * \param ValueType The type of the value.
+ * \param Buffer The value data.
+ * \param BufferLength The length of the value data.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3737,6 +5078,14 @@ PhSetValueKeyZ(
         );
 }
 
+/**
+ * Sets a registry string value.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to set.
+ * \param String The string data to set.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3764,6 +5113,14 @@ PhSetValueKeyStringZ(
         );
 }
 
+/**
+ * Sets a registry string value from a null-terminated string.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to set.
+ * \param String The null-terminated string data to set.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3788,6 +5145,46 @@ PhSetValueKeyString2Z(
         );
 }
 
+/**
+ * Sets a registry expandable string value.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to set.
+ * \param String The expandable string data to set.
+ * \return NTSTATUS Successful or error status.
+ */
+FORCEINLINE
+NTSTATUS
+NTAPI
+PhSetExpandKeyString(
+    _In_ HANDLE KeyHandle,
+    _In_ PCWSTR ValueName,
+    _In_ PCWSTR String
+    )
+{
+    PH_STRINGREF valueName;
+    PH_STRINGREF valueString;
+
+    PhInitializeStringRef(&valueName, ValueName);
+    PhInitializeStringRef(&valueString, String);
+
+    return PhSetValueKey(
+        KeyHandle,
+        &valueName,
+        REG_EXPAND_SZ,
+        valueString.Buffer,
+        (ULONG)valueString.Length + sizeof(UNICODE_NULL)
+        );
+}
+
+/**
+ * Sets a registry ULONG value.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to set.
+ * \param Value The ULONG value to set.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3818,6 +5215,13 @@ PhDeleteValueKey(
     _In_opt_ PCPH_STRINGREF ValueName
     );
 
+/**
+ * Deletes a registry value.
+ *
+ * \param KeyHandle A handle to the registry key.
+ * \param ValueName The name of the value to delete.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -3859,6 +5263,16 @@ PhEnumerateValueKey(
     _In_ KEY_VALUE_INFORMATION_CLASS InformationClass,
     _In_ PPH_ENUM_KEY_CALLBACK Callback,
     _In_opt_ PVOID Context
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhEnumerateValueKeyEx(
+    _In_ HANDLE KeyHandle,
+    _In_ ULONG Index,
+    _In_ KEY_VALUE_INFORMATION_CLASS InformationClass,
+    _Out_ PVOID* Buffer
     );
 
 PHLIBAPI
@@ -4009,8 +5423,8 @@ NTSTATUS
 NTAPI
 PhReadFile(
     _In_ HANDLE FileHandle,
-    _In_ PVOID Buffer,
-    _In_opt_ ULONG NumberOfBytesToRead,
+    _Out_writes_bytes_(NumberOfBytesToRead) PVOID Buffer,
+    _In_ ULONG NumberOfBytesToRead,
     _In_opt_ PLARGE_INTEGER ByteOffset,
     _Out_opt_ PULONG NumberOfBytesRead
     );
@@ -4020,8 +5434,8 @@ NTSTATUS
 NTAPI
 PhWriteFile(
     _In_ HANDLE FileHandle,
-    _In_ PVOID Buffer,
-    _In_opt_ ULONG NumberOfBytesToWrite,
+    _In_reads_bytes_(NumberOfBytesToWrite) PVOID Buffer,
+    _In_ ULONG NumberOfBytesToWrite,
     _In_opt_ PLARGE_INTEGER ByteOffset,
     _Out_opt_ PULONG NumberOfBytesWritten
     );
@@ -4128,6 +5542,15 @@ PhCopyFileChunkWin32(
 PHLIBAPI
 NTSTATUS
 NTAPI
+PhMoveFile(
+    _In_ PCPH_STRINGREF OldFileName,
+    _In_ PCPH_STRINGREF NewFileName,
+    _In_ BOOLEAN FailIfExists
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
 PhMoveFileWin32(
     _In_ PCWSTR OldFileName,
     _In_ PCWSTR NewFileName,
@@ -4209,6 +5632,13 @@ PhCreateNamedPipe(
     _In_ PCPH_STRINGREF PipeName
     );
 
+/**
+ * Creates a named pipe.
+ *
+ * \param PipeHandle Receives the pipe handle.
+ * \param PipeName The name of the pipe.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -4232,6 +5662,13 @@ PhConnectPipe(
     _In_ PCPH_STRINGREF PipeName
     );
 
+/**
+ * Connects to a named pipe.
+ *
+ * \param PipeHandle Receives the pipe handle.
+ * \param PipeName The name of the pipe.
+ * \return NTSTATUS Successful or error status.
+ */
 FORCEINLINE
 NTSTATUS
 NTAPI
@@ -4425,6 +5862,14 @@ NTAPI
 PhSetThreadPriorityBoost(
     _In_ HANDLE ThreadHandle,
     _In_ BOOLEAN DisablePriorityBoost
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetThreadPowerThrottlingState(
+    _In_ HANDLE ThreadHandle,
+    _Out_ PPOWER_THROTTLING_THREAD_STATE PowerThrottlingState
     );
 
 PHLIBAPI
@@ -5058,7 +6503,7 @@ NTSTATUS
 NTAPI
 PhPrefetchVirtualMemory(
     _In_ HANDLE ProcessHandle,
-    _In_ ULONG_PTR NumberOfEntries,
+    _In_ SIZE_T NumberOfEntries,
     _In_ PMEMORY_RANGE_ENTRY VirtualAddresses
     );
 
@@ -5084,7 +6529,7 @@ PHLIBAPI
 NTSTATUS
 NTAPI
 PhGetProcessorNominalFrequency(
-    _In_ PH_PROCESSOR_NUMBER ProcessorNumber,
+    _In_ PPH_PROCESSOR_NUMBER ProcessorNumber,
     _Out_ PULONG NominalFrequency
     );
 
@@ -5123,11 +6568,56 @@ PhSetSystemFileCacheSize(
 PHLIBAPI
 NTSTATUS
 NTAPI
+PhCreateMutant(
+    _Out_ PHANDLE MutantHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_opt_ PCPH_STRINGREF ObjectName,
+    _In_ BOOLEAN InitialOwner
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhOpenMutant(
+    _Out_ PHANDLE MutantHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ HANDLE RootDirectory,
+    _In_opt_ PCPH_STRINGREF ObjectName
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetMutantBasicInformation(
+    _In_ HANDLE MutantHandle,
+    _Out_ PMUTANT_BASIC_INFORMATION BasicInformation
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetMutantOwnerInformation(
+    _In_ HANDLE MutantHandle,
+    _Out_ PMUTANT_OWNER_INFORMATION OwnerInformation
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
 PhCreateEvent(
     _Out_ PHANDLE EventHandle,
     _In_ ACCESS_MASK DesiredAccess,
     _In_ EVENT_TYPE EventType,
     _In_ BOOLEAN InitialState
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetEventBasicInformation(
+    _In_ HANDLE EventHandle,
+    _Out_ PEVENT_BASIC_INFORMATION BasicInformation
     );
 
 PHLIBAPI
@@ -5342,6 +6832,29 @@ PhGetFileMotw(
     _Out_opt_ PPH_MOTW_ZONE_ID ZoneId,
     _Out_opt_ PPH_STRING* ReferrerUrl,
     _Out_opt_ PPH_STRING* HostUrl
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhCreateWaitableTimer(
+    _Out_ PHANDLE TimerHandle,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_ TIMER_TYPE TimerType,
+    _In_ BOOLEAN HighResolution
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhSetWaitableTimer(
+    _In_ HANDLE TimerHandle,
+    _In_ PLARGE_INTEGER DueTime,
+    _In_opt_ PLARGE_INTEGER Period,
+    _In_opt_ PTIMER_APC_ROUTINE TimerApcRoutine,
+    _In_opt_ PVOID TimerContext,
+    _In_ BOOLEAN ResumeTimer,
+    _In_ BOOLEAN HighResolution
     );
 
 PHLIBAPI

@@ -662,7 +662,7 @@ QVariantMap CWinHandle::GetHandleInfo() const
 			HandleInfo["Context"] = (quint64)kphAlpcInfo.PortContext;
 
 			PKPH_ALPC_COMMUNICATION_NAMES_INFORMATION connectionNames;
-			if (!NT_SUCCESS(KphAlpcQueryComminicationsNamesInfo(processHandle, (HANDLE)m_HandleId, &connectionNames)))
+			if (!NT_SUCCESS(KphAlpcQueryCommunicationsNamesInfo(processHandle, (HANDLE)m_HandleId, &connectionNames)))
 			{
 				connectionNames = NULL;
 			}
@@ -745,18 +745,18 @@ QVariantMap CWinHandle::GetHandleInfo() const
 			HandleInfo["Position"] = FilePosition;
 		}
 
-		KPH_FILE_OBJECT_DRIVER fileObjectDriver;
-		if (KphCommsIsConnected() && NT_SUCCESS(KphQueryInformationObject(processHandle, (HANDLE)m_HandleId, KphObjectFileObjectDriver, &fileObjectDriver, sizeof(fileObjectDriver), NULL)))
+		HANDLE fileObjectDriver;
+		if (KphCommsIsConnected() && NT_SUCCESS(KphQueryInformationObject(processHandle, (HANDLE)m_HandleId, KphObjectFileObjectDriver, &fileObjectDriver, sizeof(HANDLE), NULL)))
 		{
 			PPH_STRING string;
 
-			if (NT_SUCCESS(PhGetDriverName(fileObjectDriver.DriverHandle, &string)))
+			if (NT_SUCCESS(PhGetDriverName(fileObjectDriver, &string)))
 				HandleInfo["DrvDevice"] = CastPhString(string);
 
-			if (NT_SUCCESS(PhGetDriverImageFileName(fileObjectDriver.DriverHandle, &string)))
+			if (NT_SUCCESS(PhGetDriverImageFileName(fileObjectDriver, &string)))
 				HandleInfo["DrvImage"] = CastPhString(string);
 
-			NtClose(fileObjectDriver.DriverHandle);
+			NtClose(fileObjectDriver);
 		}
 	}
 	else if(m_TypeName == "Section")

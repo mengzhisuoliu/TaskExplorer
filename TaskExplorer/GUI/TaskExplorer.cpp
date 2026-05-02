@@ -33,6 +33,7 @@ extern "C" {
 #include "../../MiscHelpers/Archive/ArchiveFS.h"
 #include "TaskInfo/TaskInfoWindow.h"
 #include "OnlineUpdater.h"
+#include "API\AssemblyList.h"
 
 
 QIcon g_ExeIcon;
@@ -98,6 +99,14 @@ CTaskExplorer::CTaskExplorer(QWidget *parent)
 	: QMainWindow(parent)
 {
 	theGUI = this;
+
+	qRegisterMetaType<CAssemblyListPtr>("CAssemblyListPtr");
+	qRegisterMetaType<QList<QSharedPointer<QObject>>>("QList<QSharedPointer<QObject>>");
+	qRegisterMetaType<CStackTracePtr>("CStackTracePtr");
+	qRegisterMetaType<QHostAddress>("QHostAddress");
+	qRegisterMetaType<QSet<quint64>>("QSet<quint64>");
+	qRegisterMetaType<QSet<QString>>("QSet<QString>");
+	qRegisterMetaType<QMap<QVariant, QVariantMap>>("QMap<QVariant, QVariantMap>");
 
 	m_DefaultFontSize = QApplication::font().pointSizeF();
 

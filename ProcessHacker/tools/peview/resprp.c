@@ -356,7 +356,7 @@ VOID PvpPeEnumMappedImageResources(
             resourceNode->RvaStart = UlongToPtr(entry.Offset);
             PhPrintPointer(value, resourceNode->RvaStart);
             resourceNode->RvaStartString = PhCreateString(value);
-            resourceNode->RvaEnd = PTR_ADD_OFFSET(entry.Offset, entry.Size);
+            resourceNode->RvaEnd = (PVOID)(ULONG_PTR)UInt32Add32To64(entry.Offset, entry.Size);
             PhPrintPointer(value, resourceNode->RvaEnd);
             resourceNode->RvaEndString = PhCreateString(value);
             resourceNode->RvaSize = entry.Size;
@@ -448,11 +448,12 @@ VOID PvpPeEnumMappedImageResources(
                             resourceData,
                             entry.Size,
                             &imageResourceEntropy,
+                            NULL,
                             NULL
                             ))
                         {
                             resourceNode->ResourcesEntropy = imageResourceEntropy;
-                            resourceNode->EntropyString = PhFormatEntropy(imageResourceEntropy, 2, 0, 0);
+                            resourceNode->EntropyString = PhFormatEntropy(imageResourceEntropy, 2, 0, 0, 0, 0);
                         }
                     }
                     __except (EXCEPTION_EXECUTE_HANDLER)
@@ -529,6 +530,7 @@ NTSTATUS PvpPeResourcesEnumerateThread(
     return STATUS_SUCCESS;
 }
 
+_Function_class_(PH_SEARCHCONTROL_CALLBACK)
 VOID NTAPI PvpPeResourcesSearchControlCallback(
     _In_ ULONG_PTR MatchHandle,
     _In_opt_ PVOID Context
@@ -982,7 +984,7 @@ BOOLEAN NTAPI PvResourcesTreeNewCallback(
 
             if (!getChildren->Node)
             {
-                static PVOID sortFunctions[] =
+                static CONST _CoreCrtSecureSearchSortCompareFunction sortFunctions[] =
                 {
                     SORT_FUNCTION(Index),
                     SORT_FUNCTION(Type),
@@ -994,7 +996,7 @@ BOOLEAN NTAPI PvResourcesTreeNewCallback(
                     SORT_FUNCTION(Hash),
                     SORT_FUNCTION(Entropy),
                 };
-                int (__cdecl *sortFunction)(void *, const void *, const void *);
+                _CoreCrtSecureSearchSortCompareFunction sortFunction;
 
                 static_assert(RTL_NUMBER_OF(sortFunctions) == PV_RESOURCES_TREE_COLUMN_ITEM_MAXIMUM, "SortFunctions must equal maximum.");
 

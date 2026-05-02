@@ -5,7 +5,7 @@
  *
  * Authors:
  *
- *     jxy-s   2022-2024
+ *     jxy-s   2022-2026
  *
  */
 
@@ -74,10 +74,6 @@ VOID KphpFreeProcessCreateApc(
     KphDereferenceObject(KphpProcesCreateApcLookaside);
 }
 
-#ifdef IS_KTE
-static volatile ULONG KteProcessCleanupTrigger = FALSE;
-#endif
-
 /**
  * \brief Performing process tracking.
  *
@@ -98,31 +94,18 @@ PKPH_PROCESS_CONTEXT KphpPerformProcessTracking(
 {
     PKPH_PROCESS_CONTEXT process;
     PKPH_PROCESS_CONTEXT creatorProcess;
-    KPH_PROCESS_STATE processState;
 
     KPH_PAGED_CODE_PASSIVE();
 
+    creatorProcess = NULL;
+
     if (!CreateInfo)
     {
-#ifdef IS_KTE
-        //
-        // We want to untrack the process only once its really terminated to avoid untracking and re tracking it
-        // to this end we only mark the process as exited here and do the actual untracking in KteCidEnumCleanupProcesses
-        // after chekcing for the process object to be signaled.
-        //
-        process = KphGetProcessContext(ProcessId);
-#else
         process = KphUntrackProcessContext(ProcessId);
-#endif
         if (!process)
         {
-            return NULL;
+            goto Exit;
         }
-
-#ifdef KERNEL_DEBUG
-        //DbgPrintEx(DPFLTR_DEFAULT_ID, 0xFFFFFFFF, "BAM KphpPerformProcessTracking UnTracking: %s (%d)\n", PsGetProcessImageFileName(process->EProcess), (ULONG)(UINT_PTR)process->ProcessId);
-        DbgPrintEx(DPFLTR_DEFAULT_ID, 0xFFFFFFFF, "BAM KphpPerformProcessTracking Prepare UnTracking: %s (%d)\n", PsGetProcessImageFileName(Process), (ULONG)(UINT_PTR)ProcessId);
-#endif
 
         KphTracePrint(TRACE_LEVEL_VERBOSE,
                       TRACKING,
@@ -132,14 +115,10 @@ PKPH_PROCESS_CONTEXT KphpPerformProcessTracking(
 
         process->ExitNotification = TRUE;
 
-#ifdef IS_KTE
-        KteProcessCleanupTrigger = TRUE;
-#endif
-
         NT_ASSERT(process->NumberOfThreads == 0);
         NT_ASSERT(IsListEmpty(&process->ThreadListHead));
 
-        return process;
+        goto Exit;
     }
 
     NT_ASSERT(CreateInfo);
@@ -152,12 +131,8 @@ PKPH_PROCESS_CONTEXT KphpPerformProcessTracking(
                       "Failed to track process %lu",
                       HandleToULong(ProcessId));
 
-        return NULL;
+        goto Exit;
     }
-
-#ifdef KERNEL_DEBUG
-    DbgPrintEx(DPFLTR_DEFAULT_ID, 0xFFFFFFFF, "BAM KphpPerformProcessTracking Tracking: %s (%d)\n", PsGetProcessImageFileName(Process), (ULONG)(UINT_PTR)ProcessId);
-#endif
 
     process->CreateNotification = TRUE;
     process->CreatorClientId.UniqueProcess = PsGetCurrentProcessId();
@@ -169,136 +144,51 @@ PKPH_PROCESS_CONTEXT KphpPerformProcessTracking(
                   &process->ImageName,
                   HandleToULong(process->ProcessId));
 
-    KphVerifyProcessAndProtectIfAppropriate(process);
-
     creatorProcess = KphGetCurrentProcessContext();
     if (!creatorProcess)
     {
-        return process;
+        goto Exit;
     }
 
-    processState = KphGetProcessState(creatorProcess);
-    if ((processState & KPH_PROCESS_STATE_HIGH) == KPH_PROCESS_STATE_HIGH)
+    if (!KphTestProcessContextState(process, KPH_PROCESS_STATE_HIGH))
     {
-        process->SecurelyCreated = TRUE;
+        goto Exit;
     }
 
-    KphDereferenceObject(creatorProcess);
+    if (KphTestProcessContextState(creatorProcess, KPH_PROCESS_STATE_MAXIMUM))
+    {
+        KphProtectionSet(&process->Protection, KPH_PROTECTION_TCB);
+    }
+    else
+    {
+        PS_PROTECTION processProtection;
+
+        processProtection = PsGetProcessProtection(creatorProcess->EProcess);
+
+        if ((processProtection.Type != PsProtectedTypeNone) &&
+            ((processProtection.Signer == PsProtectedSignerWinTcb) ||
+             (processProtection.Signer == PsProtectedSignerWinSystem)))
+        {
+            KphProtectionSet(&process->Protection, KPH_PROTECTION_TCB);
+        }
+    }
+
+Exit:
+
+    if (creatorProcess)
+    {
+        KphDereferenceObject(creatorProcess);
+    }
 
     return process;
 }
 
-#ifdef IS_KTE
-
-static ULONG KteProcessCleanupCounter = 0;
-
-_Function_class_(KPH_ENUM_CID_CONTEXTS_CALLBACK)
-_Must_inspect_result_
-BOOLEAN KSIAPI KteCidEnumCleanupProcesses(
-    _In_ PVOID Context,
-    _In_opt_ PVOID Parameter
-)
-{
-    PKPH_OBJECT_TYPE objectType;
-    PKPH_PROCESS_CONTEXT process;
-
-    KPH_PAGED_CODE_PASSIVE();
-
-    UNREFERENCED_PARAMETER(Parameter);
-
-    objectType = KphGetObjectType(Context);
-
-    if (objectType == KphProcessContextType)
-    {
-        process = Context;
-
-        //
-        // non set (process tracked from KphApplyObProtections) or booth set (process tracked from KphpPerformProcessTracking and termination notified)
-        //
-        // A process may be tracked from KphApplyObProtections after termination notification
-        // in which case neider ExitNotification nor CreateNotification or TrackedFromEnum be set.
-        // In that case we have to check if the process terminated here and untrack it.
-        // The otehr case is when both ExitNotification and CreateNotification or TrackedFromEnum are set meaning
-        // the process was tracked by creation notification or enumerated and then received a termination notification.
-        // In that case we can also untrack it, after waiting for the process to fully terminate.
-        // Last but not least we can see only ExitNotification meaning it's start was aborted before we got a create notification
-        //
-
-        if ((process->ExitNotification || !(process->TrackedFromEnum || process->CreateNotification)) || KteProcessCleanupCounter == 0) 
-        {
-            NTSTATUS status;
-            LARGE_INTEGER timeout;
-
-            timeout.QuadPart = 0;
-            status = KeWaitForSingleObject(process->EProcess,
-                Executive,
-                KernelMode,
-                FALSE,
-                &timeout);
-
-            if (status != STATUS_TIMEOUT)
-            {
-                KphTracePrint(TRACE_LEVEL_VERBOSE,
-                    TRACKING,
-                    "KeWaitForSingleObject(processObject) "
-                    "reported: %!STATUS!",
-                    status);
-
-                // Note: this error message is itself prone to a race condition the cleanup condition may be false but ocne we are done with KeWaitForSingleObject the process may have terminated, hence we re check the condition
-                if (!(process->ExitNotification || !(process->TrackedFromEnum || process->CreateNotification)))
-                {
-                    KphTracePrint(TRACE_LEVEL_ERROR,
-                        TRACKING,
-                        "KteCidEnumCleanupProcesses missed cleanup of process %wZ (%lu)"
-                        ", ExitNotification =%d, CreateNotification=%d, TrackedFromEnum=%d",
-                        &process->ImageName,
-                        HandleToULong(process->ProcessId), 
-                        process->ExitNotification, process->CreateNotification, process->TrackedFromEnum);
-
-                    DbgPrintEx(DPFLTR_DEFAULT_ID, 0xFFFFFFFF, "KteCidEnumCleanupProcesses missed cleanup of process %wZ (%lu)"
-                        ", ExitNotification =%d, CreateNotification=%d, TrackedFromEnum=%d",
-                        &process->ImageName,
-                        HandleToULong(process->ProcessId), 
-                        process->ExitNotification, process->CreateNotification, process->TrackedFromEnum);
-                }
-
-#ifdef KERNEL_DEBUG
-                DbgPrintEx(DPFLTR_DEFAULT_ID, 0xFFFFFFFF, "BAM KteCidEnumCleanupProcesses UnTracking: %s (%d)\n", PsGetProcessImageFileName(process->EProcess), (ULONG)(UINT_PTR)process->ProcessId);
-#endif
-
-                process = KphUntrackProcessContext(process->ProcessId);   
-                if (process)
-                {
-                    KphDereferenceObject(process);
-                }
-            }
-        }
-    }
-
-    return FALSE;
-}
-
-_IRQL_requires_max_(APC_LEVEL)
-VOID KteCleanupProcesses()
-{
-    // this code runs every 100ms we wil check every 100 calls (~10s) if we have missed something
-    if (KteProcessCleanupCounter++ >= 100)
-        KteProcessCleanupCounter = 0;
-
-    if (KteProcessCleanupCounter % 10 == 0 || KteProcessCleanupTrigger) // every ~1s
-    {
-        KteProcessCleanupTrigger = FALSE;
-        KphEnumerateCidContexts(KteCidEnumCleanupProcesses, NULL);
-    }
-}
-#endif
-
 /**
  * \brief Informs any clients of process notify routine invocations.
  *
- * \param[in,out] Process The process being created.
+ * \param[in,out] Process The created or exiting process.
  * \param[in,out] CreateInfo Information on the process being created, if the
- * process is being destroyed this is NULL.
+ * process is exiting this is NULL.
  *
  */
 _Function_class_(PCREATE_PROCESS_NOTIFY_ROUTINE_EX)
@@ -312,18 +202,19 @@ VOID KphpCreateProcessNotifyInformer(
     PKPH_MESSAGE msg;
     PKPH_MESSAGE reply;
     PEPROCESS parentProcess;
-    PKPH_PROCESS_CONTEXT actorProcess;
+    KPH_INFORMER_OPTIONS opts;
 
     KPH_PAGED_CODE_PASSIVE();
+
+    KPH_INFORMER_CONTEXT_ENTER();
 
     msg = NULL;
     reply = NULL;
     parentProcess = NULL;
-    actorProcess = KphGetCurrentProcessContext();
 
     if (CreateInfo)
     {
-        if (!KphInformerEnabled(ProcessCreate, actorProcess))
+        if (!KphInformerEnabled(ProcessCreate))
         {
             goto Exit;
         }
@@ -349,10 +240,7 @@ VOID KphpCreateProcessNotifyInformer(
         }
 
         KphMsgInit(msg, KphMsgProcessCreate);
-        msg->Kernel.ProcessCreate.CreatingClientId.UniqueProcess = PsGetCurrentProcessId();
-        msg->Kernel.ProcessCreate.CreatingClientId.UniqueThread = PsGetCurrentThreadId();
-        msg->Kernel.ProcessCreate.CreatingProcessStartKey = KphGetCurrentProcessStartKey();
-        msg->Kernel.ProcessCreate.CreatingThreadSubProcessTag = KphGetCurrentThreadSubProcessTag();
+        KphCaptureCurrentContext(&msg->Kernel.ProcessCreate.Context);
         msg->Kernel.ProcessCreate.TargetProcessId = Process->ProcessId;
         msg->Kernel.ProcessCreate.TargetProcessStartKey = KphGetProcessStartKey(Process->EProcess);
         msg->Kernel.ProcessCreate.Flags = CreateInfo->Flags;
@@ -392,12 +280,14 @@ VOID KphpCreateProcessNotifyInformer(
             }
         }
 
-        if (KphInformerEnabled(EnableStackTraces, actorProcess))
+        opts = KphInformerOpts();
+
+        if (opts.EnableStackTraces)
         {
             KphCaptureStackInMessage(msg);
         }
 
-        if (!KphInformerEnabled(EnableProcessCreateReply, actorProcess))
+        if (!opts.EnableProcessCreateReply)
         {
             KphCommsSendMessageAsync(msg);
             msg = NULL;
@@ -435,7 +325,7 @@ VOID KphpCreateProcessNotifyInformer(
     }
     else
     {
-        if (!KphInformerEnabled(ProcessExit, actorProcess))
+        if (!KphInformerEnabled(ProcessExit))
         {
             goto Exit;
         }
@@ -450,12 +340,11 @@ VOID KphpCreateProcessNotifyInformer(
         }
 
         KphMsgInit(msg, KphMsgProcessExit);
-        msg->Kernel.ProcessExit.ClientId.UniqueProcess = PsGetCurrentProcessId();
-        msg->Kernel.ProcessExit.ClientId.UniqueThread = PsGetCurrentThreadId();
-        msg->Kernel.ProcessExit.ProcessStartKey = KphGetProcessStartKey(Process->EProcess);
+        NT_ASSERT(Process->EProcess == PsGetCurrentProcess());
+        KphCaptureCurrentContext(&msg->Kernel.ProcessExit.Context);
         msg->Kernel.ProcessExit.ExitStatus = PsGetProcessExitStatus(Process->EProcess);
 
-        if (KphInformerEnabled(EnableStackTraces, actorProcess))
+        if (KphInformerOpts().EnableStackTraces)
         {
             KphCaptureStackInMessage(msg);
         }
@@ -481,10 +370,7 @@ Exit:
         ObDereferenceObject(parentProcess);
     }
 
-    if (actorProcess)
-    {
-        KphDereferenceObject(actorProcess);
-    }
+    KPH_INFORMER_CONTEXT_EXIT();
 }
 
 /**
@@ -542,7 +428,7 @@ VOID KSIAPI KphpProcessCreateKernelRoutine(
 {
     PKPH_PROCESS_CREATE_APC apc;
 
-    KPH_PAGED_CODE();
+    KPH_PAGED_CODE_APC();
 
     apc = CONTAINING_RECORD(Apc, KPH_PROCESS_CREATE_APC, Apc);
 
@@ -690,7 +576,7 @@ Exit:
 
     if (stopProtecting)
     {
-        KphStopProtectingProcess(Process);
+        KphProtectionClear(&Process->Protection, KPH_PROTECTION_ACTIVE);
     }
 }
 
@@ -713,13 +599,6 @@ VOID KphpCreateProcessNotifyRoutine(
     PKPH_PROCESS_CONTEXT process;
 
     KPH_PAGED_CODE_PASSIVE();
-
-#ifndef IS_KTE
-    if (!CreateInfo)
-    {
-        KphInvalidateLsass(ProcessId);
-    }
-#endif
 
     process = KphpPerformProcessTracking(Process, ProcessId, CreateInfo);
     if (process)
